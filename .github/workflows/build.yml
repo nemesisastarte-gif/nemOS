@@ -465,54 +465,54 @@ jobs:
           WORKDIR=/opt/nemos-iso-work
           ISO_OUT=/opt/nemos-out
           ISO_NAME="nemOS-1.0.0-$(date +%Y%m%d)-i386"
+          CHROOT=/opt/nemos-chroot
 
-          sudo mkdir -p "$WORKDIR/iso" "$ISO_OUT" "$WORKDIR/iso/isolinux" "$WORKDIR/iso/boot"
+          sudo mkdir -p "$WORKDIR/iso/live" "$WORKDIR/iso/boot" "$WORKDIR/iso/isolinux" "$ISO_OUT"
 
-          # Copier le noyau et l'initrd
-          sudo cp /opt/nemos-chroot/boot/vmlinuz-* "$WORKDIR/iso/boot/vmlinuz" 2>/dev/null || true
-          sudo cp /opt/nemos-chroot/boot/initrd.img-* "$WORKDIR/iso/boot/initrd" 2>/dev/null || true
-
-          # Verifier que le noyau existe
-          if [ ! -f "$WORKDIR/iso/boot/vmlinuz" ]; then
-            echo "ERREUR: Noyau non trouve dans le chroot"
-            ls -la /opt/nemos-chroot/boot/
-            exit 1
-          fi
-
+          # Copier uniquement le noyau et l'initrd (rapide)
+          sudo cp "$CHROOT"/boot/vmlinuz-* "$WORKDIR/iso/boot/vmlinuz"
+          sudo cp "$CHROOT"/boot/initrd.img-* "$WORKDIR/iso/boot/initrd"
           echo "Noyau: $(du -sh $WORKDIR/iso/boot/vmlinuz | cut -f1)"
-          echo "Initrd: $(du -sh $WORKDIR/iso/boot/initrd | cut -f1)"
 
-          # Copier le filesystem complet dans l'ISO (pour un systeme live simple)
-          # Pas de squashfs - le systeme est installe directement dans l'ISO
-          echo "Copie du filesystem (cela peut prendre du temps)..."
-          sudo cp -a /opt/nemos-chroot/* "$WORKDIR/iso/" 2>/dev/null &
-          CP_PID=$!
-          # Afficher la progression
-          while kill -0 $CP_PID 2>/dev/null; do sleep 10; echo "  copie en cours..."; done
-          wait $CP_PID
+          # Creer le squashfs directement depuis le chroot (exclure les mounts)
+          echo "Compression squashfs..."
+          sudo mksquashfs "$CHROOT" "$WORKDIR/iso/live/filesystem.squashfs" \
+            -comp zstd -Xcompression-level 15 -b 512K \
+            -noappend \
+            -e "proc" "sys" "dev" "run" "tmp" "var/tmp" \
+            -e "var/cache/apt" "var/cache/debconf" \
+            -e "var/lib/dpkg/info/available" \
+            -e "root/.cache" "home/nem/.cache" \
+            2>&1 | tail -3
 
-          echo "Taille du filesystem ISO: $(sudo du -sh $WORKDIR/iso | cut -f1)"
-
-          # Configurer le fstab et mounts pour le live
-          sudo mkdir -p "$WORKDIR/iso/etc"
-          printf '/dev/sr0\t/iso\tiso9660\tro,relatime\t0 0\n' | sudo tee -a "$WORKDIR/iso/etc/fstab" > /dev/null
+          SQ_SIZE=$(du -sh "$WORKDIR/iso/live/filesystem.squashfs" | cut -f1)
+          echo "SquashFS: $SQ_SIZE"
 
           # Isolinux - boot BIOS
           sudo cp /usr/lib/ISOLINUX/isolinux.bin "$WORKDIR/iso/isolinux/"
           sudo cp /usr/lib/syslinux/modules/bios/ldlinux.c32 "$WORKDIR/iso/isolinux/"
           sudo cp /usr/lib/syslinux/modules/bios/libcom32.c32 "$WORKDIR/iso/isolinux/" 2>/dev/null || true
-          sudo cp /usr/lib/syslinux/modules/bios/libutil.c32 "$WORKDIR/iso/isolinux/" 2>/dev/null || true
 
           # Config isolinux
-          printf 'DEFAULT nemos\nPROMPT 0\nTIMEOUT 50\n\n' | sudo tee "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null
-          printf 'LABEL nemos\n  MENU LABEL nemOS - Mode Live (32-bit)\n  KERNEL /boot/vmlinuz\n  APPEND initrd=/boot/initrd boot=live quiet splash\n  MENU DEFAULT\n' | sudo tee -a "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null
-          printf '\nLABEL nemos-safe\n  MENU LABEL nemOS - Mode sans echec\n  KERNEL /boot/vmlinuz\n  APPEND initrd=/boot/initrd boot=live nomodeset\n' | sudo tee -a "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null
+          sudo tee "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null << 'CFGEOF'
+          DEFAULT nemos
+          PROMPT 0
+          TIMEOUT 50
+          LABEL nemos
+            MENU LABEL nemOS - Mode Live (32-bit)
+            KERNEL /boot/vmlinuz
+            APPEND initrd=/boot/initrd boot=live components quiet splash
+            MENU DEFAULT
+          LABEL nemos-safe
+            MENU LABEL nemOS - Mode sans echec
+            KERNEL /boot/vmlinuz
+            APPEND initrd=/boot/initrd boot=live nomodeset
+          CFGEOF
 
-          # Splash screen
           sudo cp nem/syslinux/splash.png "$WORKDIR/iso/isolinux/" 2>/dev/null || true
 
-          # Creation ISO avec xorriso (isolinux, BIOS boot)
-          echo "Creation de l'ISO avec xorriso..."
+          # Creation ISO
+          echo "Creation ISO avec xorriso..."
           sudo xorriso -as mkisofs \
             -r \
             -V "nemOS" \
@@ -523,19 +523,17 @@ jobs:
             -boot-load-size 4 \
             -boot-info-table \
             "$WORKDIR/iso" \
-            2>&1
+            2>&1 | tail -5
 
-          # Verifier
           if [ -f "${ISO_OUT}/${ISO_NAME}.iso" ]; then
             ISO_SIZE=$(du -sh "${ISO_OUT}/${ISO_NAME}.iso" | cut -f1)
-            echo "ISO creee avec succes : ${ISO_NAME}.iso (${ISO_SIZE})"
+            echo "ISO creee : ${ISO_NAME}.iso (${ISO_SIZE})"
             ls -lh "${ISO_OUT}/"
           else
             echo "ERREUR: ISO non creee"
             exit 1
           fi
 
-          # Checksum
           (cd "$ISO_OUT" && sha256sum "${ISO_NAME}.iso" > "${ISO_NAME}.iso.sha256")
           echo "iso_name=${ISO_NAME}" >> "$GITHUB_OUTPUT"
 
