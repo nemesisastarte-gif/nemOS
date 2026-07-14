@@ -8,7 +8,7 @@ on:
         required: true
         default: 'v1.0.0'
       run_id:
-        description: 'ID du build run contenant l ISO (laisser vide pour le dernier run reussi)'
+        description: 'ID du build run (vide = dernier run reussi)'
         required: false
         default: ''
 
@@ -56,69 +56,25 @@ jobs:
           ls -lh *.iso *.sha256
           ISO_FILE=$(ls *.iso 2>/dev/null | head -1)
           if [ -z "$ISO_FILE" ]; then
-            echo "ERREUR: Aucun fichier ISO trouvé"
+            echo "ERREUR: Aucun fichier ISO"
             exit 1
           fi
           echo "ISO: $ISO_FILE ($(du -sh "$ISO_FILE" | cut -f1))"
 
-      - name: Upload sur la release via API
+      - name: Upload sur la release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ github.event.inputs.release_tag }}"
-          REPO="${{ github.repository }}"
           ISO_FILE=$(ls *.iso 2>/dev/null | head -1)
           SHA_FILE=$(ls *.sha256 2>/dev/null | head -1)
 
           echo "Publication sur la release $TAG..."
-          echo "Fichiers: $ISO_FILE, $SHA_FILE"
 
-          # Trouver l'upload URL de la release existante
-          RELEASE_DATA=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/$REPO/releases/tags/$TAG")
+          # S'assurer que la release n'est plus en brouillon
+          gh release edit "$TAG" --draft=false 2>/dev/null || true
 
-          UPLOAD_URL=$(echo "$RELEASE_DATA" | python3 -c "import json,sys; print(json.load(sys.stdin)['upload_url'].split('{?')[0])")
-
-          if [ -z "$UPLOAD_URL" ]; then
-            echo "Release $TAG non trouvee, creation via gh..."
-            gh release create "$TAG" \
-              --title "nemOS $TAG" \
-              --notes "nemOS $TAG - Distribution Linux 32-bit avec interface macOS-like
-
-              ## Utilisation
-              1. Flasher l ISO sur une cle USB avec Rufus ou BalenaEtcher
-              2. Demarrer l ordinateur depuis la cle USB
-              3. Profiter de nemOS !
-
-              ## Systeme requis
-              - Processeur 32-bit (i686) ou 64-bit compatible
-              - 512 Mo RAM minimum
-              - 4 Go d espace disque"
-            # Re-get upload URL after creation
-            sleep 2
-            RELEASE_DATA=$(curl -s -H "Authorization: token $GH_TOKEN" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/$REPO/releases/tags/$TAG")
-            UPLOAD_URL=$(echo "$RELEASE_DATA" | python3 -c "import json,sys; print(json.load(sys.stdin)['upload_url'].split('{?')[0])")
-          fi
-
-          echo "Upload URL: $UPLOAD_URL"
-
-          # Uploader l'ISO
-          echo "Upload de $ISO_FILE..."
-          curl --progress-bar -X POST \
-            -H "Authorization: token $GH_TOKEN" \
-            -H "Content-Type: application/x-iso9660-image" \
-            --data-binary "@$ISO_FILE" \
-            "$UPLOAD_URL?name=$(basename $ISO_FILE)" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'  ISO uploadé: {d.get(\"name\",\"?\")} ({d.get(\"size\",0)} bytes)') if 'name' in d else print(f'  Erreur: {d}')"
-
-          # Uploader le checksum
-          echo "Upload de $SHA_FILE..."
-          curl -s -X POST \
-            -H "Authorization: token $GH_TOKEN" \
-            -H "Content-Type: text/plain" \
-            --data-binary "@$SHA_FILE" \
-            "$UPLOAD_URL?name=$(basename $SHA_FILE)" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'  Checksum uploadé: {d.get(\"name\",\"?\")}')" if 'name' in d else print(f'  Erreur: {d}')"
+          # Upload les fichiers
+          gh release upload "$TAG" "$ISO_FILE" "$SHA_FILE" --clobber
 
           echo "Publication terminee !"
