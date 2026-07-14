@@ -9,9 +9,9 @@ name: Construction nemOS ISO
 
 on:
   push:
-    branches: [main]
+    branches: [mmain
   pull_request:
-    branches: [main]
+    branches: [mmain
   workflow_dispatch:
     inputs:
       skip_tests:
