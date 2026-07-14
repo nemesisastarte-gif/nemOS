@@ -1,0 +1,11 @@
+##
+## /etc/pacman.d/mirrorlist32 - Miroirs Arch Linux 32
+## Généré pour nemOS - Distribution 32-bit
+##
+## Les miroirs sont classés par rapidité estimée.
+##
+
+Server = http://mirror.archlinux32.org/i686/$repo
+Server = https://mirror.archlinux32.org/i686/$repo
+Server = http://dl.gnedv.me/archlinux32/i686/$repo
+Server = https://dl.gnedv.me/archlinux32/i686/$repo

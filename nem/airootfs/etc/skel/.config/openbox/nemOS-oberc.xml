@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- nemOS Openbox Menu - French categories, macOS-inspired -->
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+
+  <!-- Accessoires -->
+  <menu id="accessoires" label="Accessoires">
+    <item label="Terminal">
+      <action name="Execute">
+        <command>xfce4-terminal</command>
+      </action>
+    </item>
+    <item label="Gestionnaire de fichiers">
+      <action name="Execute">
+        <command>thunar</command>
+      </action>
+    </item>
+    <item label="Éditeur de texte (Geany)">
+      <action name="Execute">
+        <command>geany</command>
+      </action>
+    </item>
+    <item label="Calculatrice">
+      <action name="Execute">
+        <command>galculator</command>
+      </action>
+    </item>
+    <item label="Visionneur d'images">
+      <action name="Execute">
+        <command>ristretto</command>
+      </action>
+    </item>
+    <item label="Capture d'écran">
+      <action name="Execute">
+        <command>xfce4-screenshooter</command>
+      </action>
+    </item>
+    <item label="Archivage de fichiers">
+      <action name="Execute">
+        <command>file-roller</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Rechercher des fichiers">
+      <action name="Execute">
+        <command>catfish</command>
+      </action>
+    </item>
+  </menu>
+
+  <!-- Internet -->
+  <menu id="internet" label="Internet">
+    <item label="Navigateur Web (Firefox)">
+      <action name="Execute">
+        <command>firefox-esr</command>
+      </action>
+    </item>
+    <item label="Navigateur Web (Firefox ESR privé)">
+      <action name="Execute">
+        <command>firefox-esr --private-window</command>
+      </action>
+    </item>
+    <item label="Client de messagerie (Thunderbird)">
+      <action name="Execute">
+        <command>thunderbird</command>
+      </action>
+    </item>
+    <item label="Client IRC (Hexchat)">
+      <action name="Execute">
+        <command>hexchat</command>
+      </action>
+    </item>
+    <item label="Téléchargement de fichiers (Transmission)">
+      <action name="Execute">
+        <command>transmission-gtk</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Partage de fichiers (SMB)">
+      <action name="Execute">
+        <command>thunar smb://</command>
+      </action>
+    </item>
+  </menu>
+
+  <!-- Bureautique -->
+  <menu id="bureautique" label="Bureautique">
+    <item label="Traitement de texte (Writer)">
+      <action name="Execute">
+        <command>libreoffice --writer</command>
+      </action>
+    </item>
+    <item label="Tableur (Calc)">
+      <action name="Execute">
+        <command>libreoffice --calc</command>
+      </action>
+    </item>
+    <item label="Présentation (Impress)">
+      <action name="Execute">
+        <command>libreoffice --impress</command>
+      </action>
+    </item>
+    <item label="Formules mathématiques (Math)">
+      <action name="Execute">
+        <command>libreoffice --math</command>
+      </action>
+    </item>
+    <item label="Dessin (Draw)">
+      <action name="Execute">
+        <command>libreoffice --draw</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Visionneur PDF (Evince)">
+      <action name="Execute">
+        <command>evince</command>
+      </action>
+    </item>
+    <item label="Dictionnaire">
+      <action name="Execute">
+        <command>xfce4-dict</command>
+      </action>
+    </item>
+  </menu>
+
+  <!-- Multimédia -->
+  <menu id="multimedia" label="Multimédia">
+    <item label="Lecteur multimédia (VLC)">
+      <action name="Execute">
+        <command>vlc</command>
+      </action>
+    </item>
+    <item label="Lecteur audio (Parole)">
+      <action name="Execute">
+        <command>parole</command>
+      </action>
+    </item>
+    <item label="Lecteur audio (Audacious)">
+      <action name="Execute">
+        <command>audacious</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Éditeur audio (Audacity)">
+      <action name="Execute">
+        <command>audacity</command>
+      </action>
+    </item>
+    <item label="Gravure de disques (Xfburn)">
+      <action name="Execute">
+        <command>xfburn</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Enregistreur d'écran (OBS Studio)">
+      <action name="Execute">
+        <command>obs</command>
+      </action>
+    </item>
+  </menu>
+
+  <!-- Système -->
+  <menu id="systeme" label="Système">
+    <item label="Gestionnaire de paquets (nemOS Store)">
+      <action name="Execute">
+        <command>nemos-store</command>
+      </action>
+    </item>
+    <item label="Terminal administrateur">
+      <action name="Execute">
+        <command>xfce4-terminal -x sudo -s</command>
+      </action>
+    </item>
+    <item label="Moniteur système (htop)">
+      <action name="Execute">
+        <command>xfce4-terminal -x htop</command>
+      </action>
+    </item>
+    <item label="Gestionnaire de tâches">
+      <action name="Execute">
+        <command>xfce4-taskmanager</command>
+      </action>
+    </item>
+    <item label="Éditeur de partitions (GParted)">
+      <action name="Execute">
+        <command>gksudo gparted</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Disques">
+      <action name="Execute">
+        <command>gnome-disks</command>
+      </action>
+    </item>
+  </menu>
+
+  <!-- Paramètres -->
+  <menu id="parametres" label="Paramètres">
+    <item label="Paramètres du système">
+      <action name="Execute">
+        <command>xfce4-settings-manager</command>
+      </action>
+    </item>
+    <item label="Apparence">
+      <action name="Execute">
+        <command>xfce4-appearance-settings</command>
+      </action>
+    </item>
+    <item label="Papier peint">
+      <action name="Execute">
+        <command>xfce4-desktop-settings</command>
+      </action>
+    </item>
+    <item label="Gestionnaire de thèmes GTK">
+      <action name="Execute">
+        <command>lxappearance</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Clavier">
+      <action name="Execute">
+        <command>xfce4-keyboard-settings</command>
+      </action>
+    </item>
+    <item label="Souris et pavé tactile">
+      <action name="Execute">
+        <command>xfce4-mouse-settings</command>
+      </action>
+    </item>
+    <item label="Moniteurs">
+      <action name="Execute">
+        <command>xfce4-display-settings -m</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Son">
+      <action name="Execute">
+        <command>pavucontrol</command>
+      </action>
+    </item>
+    <item label="Réseau (NetworkManager)">
+      <action name="Execute">
+        <command>nm-connection-editor</command>
+      </action>
+    </item>
+    <item label="Impression">
+      <action name="Execute">
+        <command>system-config-printer</command>
+      </action>
+    </item>
+    <item label="Informations sur le système">
+      <action name="Execute">
+        <command>xfce4-about</command>
+      </action>
+    </item>
+    <separator/>
+    <item label="Openbox Configuration Manager">
+      <action name="Execute">
+        <command>obconf</command>
+      </action>
+    </item>
+    <item label="Éditeur de menu Openbox">
+      <action name="Execute">
+        <command>obmenu</command>
+      </action>
+    </item>
+    <item label="Configuration du dock (Plank)">
+      <action name="Execute">
+        <command>plank --preferences</command>
+      </action>
+    </item>
+  </menu>
+
+  <!-- Desktop right-click menu -->
+  <menu id="root-menu" label="nemOS">
+    <separator label="Applications" />
+    <menu id="accessoires" />
+    <menu id="internet" />
+    <menu id="bureautique" />
+    <menu id="multimedia" />
+    <separator label="Système" />
+    <menu id="systeme" />
+    <menu id="parametres" />
+    <separator/>
+    <menu id="client-list-menu" label="Fenêtres ouvertes" />
+    <separator/>
+    <item label="Lancer une application...">
+      <action name="Execute">
+        <command>rofi -show drun -theme ~/.config/rofi/config.rasi</command>
+      </action>
+    </item>
+    <item label="Exécuter une commande...">
+      <action name="Execute">
+        <command>rofi -show run -theme ~/.config/rofi/config.rasi</command>
+      </action>
+    </item>
+    <separator/>
+    <menu id="desktops" label="Bureaux virtuels">
+      <item label="Bureau 1">
+        <action name="GoToDesktop">
+          <to>1</to>
+        </action>
+      </item>
+      <item label="Bureau 2">
+        <action name="GoToDesktop">
+          <to>2</to>
+        </action>
+      </item>
+      <item label="Bureau 3">
+        <action name="GoToDesktop">
+          <to>3</to>
+        </action>
+      </item>
+      <item label="Bureau 4">
+        <action name="GoToDesktop">
+          <to>4</to>
+        </action>
+      </item>
+    </menu>
+    <separator/>
+    <item label="Recharger la configuration">
+      <action name="Reconfigure"/>
+    </item>
+    <item label="Redémarrer Openbox">
+      <action name="Restart"/>
+    </item>
+    <separator/>
+    <item label="Verrouiller l'écran">
+      <action name="Execute">
+        <command>light-locker-command -l</command>
+      </action>
+    </item>
+    <item label="Mettre en veille">
+      <action name="Execute">
+        <command>systemctl suspend</command>
+      </action>
+    </item>
+    <item label="Déconnexion...">
+      <action name="Exit"/>
+    </item>
+  </menu>
+
+</openbox_menu>

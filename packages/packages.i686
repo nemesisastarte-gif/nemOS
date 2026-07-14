@@ -1,0 +1,193 @@
+# Liste des paquets nemOS i686 - Optimisé pour la légèreté
+# Distribution 32-bit avec interface macOS-like
+# Seuls les paquets essentiels sont inclus
+
+## --- BASE SYSTÈME ---
+base
+bash
+bash-completion
+coreutils
+filesystem
+findutils
+gawk
+gcc-libs
+glibc
+grep
+gzip
+sed
+tar
+systemd
+systemd-sysvcompat
+util-linux
+which
+file
+licenses
+man-db
+man-pages-fr
+
+## --- RÉSEAU ---
+networkmanager
+nm-connection-editor
+dhcpcd
+wpa_supplicant
+iwd
+wireless_tools
+net-tools
+openssh
+curl
+wget
+rsync
+
+## --- AUDIO ---
+alsa-utils
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+pavucontrol
+volumeicon
+
+## --- PIL VIDEO i686 ---
+mesa
+mesa-demos
+xf86-video-vesa
+xf86-video-intel
+xf86-video-ati
+xf86-video-nouveau
+xf86-video-fbdev
+xf86-input-libinput
+xorg-server
+xorg-xinit
+xorg-xrandr
+xorg-xsetroot
+xorg-xdpyinfo
+
+## --- GESTIONNAIRE DE FENÊTRES ---
+openbox
+obconf
+openbox-menu
+tint2
+plank
+
+## --- THÈME ET ICÔNES ---
+gtk-engine-murrine
+gtk-engines
+gtk2-engines-murrine
+kvantum
+hicolor-icon-theme
+adwaita-icon-theme
+gnome-icon-theme
+
+## --- POLICES (minimum, sans CJK pour économiser de l'espace) ---
+ttf-dejavu
+ttf-liberation
+ttf-bitstream-vera
+noto-fonts
+fontconfig
+
+## --- OUTILS BUREAU ---
+rofi
+rofi-dmenu
+xcompmgr
+tint2
+pcmanfm
+thunar
+thunar-archive-plugin
+thunar-volman
+gvfs
+gvfs-smb
+gvfs-mtp
+tumbler
+file-roller
+xarchiver
+
+## --- TERMINAL ET DÉVELOPPEMENT ---
+xfce4-terminal
+geany
+nano
+nano-syntax-highlighting
+vim
+htop
+neofetch
+fastfetch
+
+## --- NAVIGATEUR WEB ---
+firefox-esr
+
+## --- SUITE BUREAUTIQUE LÉGÈRE ---
+libreoffice-fresh
+libreoffice-fresh-fr
+
+## --- MULTIMÉDIA ---
+mpv
+vlc
+gstreamer
+gst-plugins-good
+gst-plugins-bad
+gst-plugins-ugly
+gst-libav
+ffmpegthumbnailer
+
+## --- IMAGE ---
+ristretto
+gpicview
+scrot
+spectacle
+
+## --- OUTILS SYSTÈME ---
+gparted
+e2fsprogs
+dosfstools
+exfatprogs
+ntfs-3g
+f2fs-tools
+btrfs-progs
+cryptsetup
+parted
+testdisk
+gnome-disk-utility
+
+## --- IMPRESSION ---
+cups
+cups-pdf
+system-config-printer
+
+## --- GESTION DES PAQUETS ---
+pacman
+pamac-aur
+flatpak
+
+## --- SÉCURITÉ ---
+sudo
+polkit
+gnome-keyring
+seahorse
+
+## --- DOCUMENTATION ---
+zenity
+yad
+lxappearance
+qt5ct
+
+## --- SCANNER DE MATÉRIEL ---
+lshw
+inxi
+hwinfo
+usbutils
+pciutils
+
+## --- INSTALLATEUR ---
+calamares
+python-pyqt5
+python-yaml
+python-jinja
+
+## --- PAQUETS nemOS SPÉCIFIQUES (construits localement) ---
+# Ces paquets seront construits dans le dépôt nemos-repo/
+# nemos-icons
+# nemos-wallpapers
+# nemos-store
+# nemos-settings
+# nemos-firstboot
+# nemos-bootsound
+# nemos-dock-config

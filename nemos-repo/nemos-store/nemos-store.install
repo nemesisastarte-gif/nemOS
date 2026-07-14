@@ -1,0 +1,30 @@
+# Script de post-installation/pre-désinstallation pour nemos-store
+
+post_install() {
+    echo "  -> nemos-store : Mise à jour du cache des applications..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+    echo "  -> nemos-store : Mise à jour du cache des icônes..."
+    gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
+    echo "  -> nemos-store : Installation terminée."
+    echo "     Lancez 'nemos-store' ou cherchez 'nemOS Store' dans le menu."
+}
+
+post_upgrade() {
+    echo "  -> nemos-store : Mise à jour du cache..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+    gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
+    echo "  -> nemos-store : Mise à jour terminée."
+}
+
+pre_remove() {
+    echo "  -> nemos-store : Suppression en cours..."
+}
+
+post_remove() {
+    echo "  -> nemos-store : Nettoyage du cache..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+    gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
+    # Supprimer le lien symbolique s'il existe
+    rm -f /usr/bin/nemos-store 2>/dev/null || true
+    echo "  -> nemos-store : Suppression terminée."
+}

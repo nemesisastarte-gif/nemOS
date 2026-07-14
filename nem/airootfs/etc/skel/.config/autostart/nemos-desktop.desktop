@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=nemOS Desktop
+Name[fr]=Bureau nemOS
+Comment=Launch nemOS desktop session components
+Comment[fr]=Lance les composants de la session bureau nemOS
+Exec=/etc/skel/.config/nemos-desktop.sh
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-Phase=Desktop
+X-GNOME-AutoRestart=false
+X-GNOME-Autostart-Notify=false
+X-KDE-autostart-after=panel

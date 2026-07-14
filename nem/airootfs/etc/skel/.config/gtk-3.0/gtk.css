@@ -1,0 +1,98 @@
+/* nemOS user GTK3 overrides — macOS-like tweaks */
+
+/* ── Window titlebar: macOS traffic-light buttons on the left ── */
+.titlebar .button.titlebutton,
+headerbar .button.titlebutton {
+  padding: 0 6px;
+  min-width: 20px;
+  min-height: 20px;
+  border-radius: 50%;
+  border: none;
+  color: transparent;
+  background: #555;
+  margin: 0 3px;
+}
+
+.titlebar .button.titlebutton.close,
+headerbar .button.titlebutton.close {
+  background: #FF5F57;
+}
+.titlebar .button.titlebutton.close:hover,
+headerbar .button.titlebutton.close:hover {
+  background: #FF3B30;
+}
+
+.titlebar .button.titlebutton.maximize,
+headerbar .button.titlebutton.maximize {
+  background: #28C840;
+}
+.titlebar .button.titlebutton.maximize:hover,
+headerbar .button.titlebutton.maximize:hover {
+  background: #00B825;
+}
+
+.titlebar .button.titlebutton.minimize,
+headerbar .button.titlebutton.minimize {
+  background: #FFBD2E;
+}
+.titlebar .button.titlebutton.minimize:hover,
+headerbar .button.titlebutton.minimize:hover {
+  background: #FFB800;
+}
+
+/* ── Sidebar: slightly darker, seamless look ── */
+.sidebar {
+  background: #181825;
+  border-right: 1px solid #313244;
+}
+
+.sidebar .label {
+  color: #CDD6F4;
+  font-size: 10px;
+}
+
+.sidebar-row:selected,
+.sidebar .view:selected {
+  background: #1A73E8;
+  border-radius: 6px;
+}
+
+/* ── Scrollbar: thin, macOS-style overlay ── */
+scrollbar {
+  -GtkScrollbar-has-backward-stepper: false;
+  -GtkScrollbar-has-forward-stepper: false;
+  -GtkRange-slider-width: 8px;
+}
+
+scrollbar slider {
+  background: rgba(205, 214, 244, 0.25);
+  border-radius: 4px;
+  margin: 2px;
+}
+
+scrollbar slider:hover {
+  background: rgba(205, 214, 244, 0.45);
+}
+
+scrollbar trough {
+  background: transparent;
+  border: none;
+}
+
+/* ── Selection ── */
+selection,
+*:selected {
+  background: #1A73E8;
+  color: #FFFFFF;
+}
+
+/* ── Tooltip ── */
+.tooltip {
+  background: #313244;
+  color: #CDD6F4;
+  border-radius: 6px;
+  border: none;
+  padding: 4px 10px;
+  font-size: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}

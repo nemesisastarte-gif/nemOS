@@ -1,0 +1,163 @@
+# Mainteneur : nemOS <contact@nemos.dev>
+# Paquet : nemos-wallpapers
+# Fonds d'écran personnalisés pour nemOS
+
+pkgname=nemos-wallpapers
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Fonds d'écran pour nemOS - Dégradés bleu nuit vers bleu électrique"
+arch=('any')
+url="https://nemos.dev"
+license=('CC-BY-SA-4.0')
+depends=()
+makedepends=()
+provides=('nemos-backgrounds')
+conflicts=('nemos-backgrounds')
+replaces=('nemos-backgrounds')
+options=('!strip')
+
+# Les fonds d'écran sont des sources locales dans le dépôt
+# Ils se trouvent dans le sous-répertoire src/ de ce paquet
+source=(
+    "nemos-default.png"
+    "nemos-dark.png"
+    "nemos-sunset.png"
+    "nemos-ocean.png"
+    "nemos-minimal.png"
+)
+# Sommes de contrôle à mettre à jour lors de l'ajout de nouveaux fonds
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    'SKIP'
+    'SKIP'
+    'SKIP'
+)
+
+# Alternative : si les images ne sont pas dans le même répertoire,
+# décommenter et ajuster les lignes suivantes :
+# source=("wallpapers/")
+# sha256sums=('SKIP')
+
+package() {
+    # Répertoire de destination des fonds d'écran
+    local wpdir="${pkgdir}/usr/share/backgrounds/nemOS"
+    mkdir -p "${wpdir}"
+
+    # Copier tous les fonds d'écran PNG depuis srcdir
+    echo "  -> Installation des fonds d'écran nemOS..."
+    if [ -d "${srcdir}" ]; then
+        for wp in "${srcdir}"/*.png "${srcdir}"/*.jpg "${srcdir}"/*.jpeg "${srcdir}"/*.webp; do
+            if [ -f "${wp}" ]; then
+                echo "     -> $(basename "${wp}")"
+                install -Dm644 "${wp}" "${wpdir}/$(basename "${wp}")"
+            fi
+        done
+    fi
+
+    # Vérifier qu'au moins un fond d'écran est installé
+    if [ -z "$(ls -A "${wpdir}" 2>/dev/null)" ]; then
+        echo "  -> AVERTISSEMENT : Aucun fond d'écran trouvé dans ${srcdir}"
+        echo "     Création d'un répertoire vide comme fallback."
+    fi
+
+    # Installer le fond d'écran par défaut comme fond d'écran système
+    # (utilisé par lightdm, sddm, etc.)
+    local syswpdir="${pkgdir}/usr/share/backgrounds"
+    if [ -f "${wpdir}/nemos-default.png" ]; then
+        ln -sf "nemOS/nemos-default.png" "${syswpdir}/nemOS-default.png"
+    elif [ -f "${wpdir}/nemos-dark.png" ]; then
+        ln -sf "nemOS/nemos-dark.png" "${syswpdir}/nemOS-default.png"
+    fi
+
+    # Installer les métadonnées XML pour GNOME/KDE (fond d'écran par défaut)
+    install -Dm644 /dev/stdin "${wpdir}/nemOS.xml" << 'XML_EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>nemOS - Défaut</name>
+    <name xml:lang="en">nemOS - Default</name>
+    <filename>/usr/share/backgrounds/nemOS/nemos-default.png</filename>
+    <options>zoom</options>
+    <pcolor>#0A1628</pcolor>
+    <scolor>#1A73E8</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>nemOS - Sombre</name>
+    <name xml:lang="en">nemOS - Dark</name>
+    <filename>/usr/share/backgrounds/nemOS/nemos-dark.png</filename>
+    <options>zoom</options>
+    <pcolor>#0A1628</pcolor>
+    <scolor>#000000</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>nemOS - Coucher de soleil</name>
+    <name xml:lang="en">nemOS - Sunset</name>
+    <filename>/usr/share/backgrounds/nemOS/nemos-sunset.png</filename>
+    <options>zoom</options>
+    <pcolor>#1A0A28</pcolor>
+    <scolor>#E86A1A</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>nemOS - Océan</name>
+    <name xml:lang="en">nemOS - Ocean</name>
+    <filename>/usr/share/backgrounds/nemOS/nemos-ocean.png</filename>
+    <options>zoom</options>
+    <pcolor>#0A1628</pcolor>
+    <scolor>#1A73E8</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>nemOS - Minimal</name>
+    <name xml:lang="en">nemOS - Minimal</name>
+    <filename>/usr/share/backgrounds/nemOS/nemos-minimal.png</filename>
+    <options>zoom</options>
+    <pcolor>#11111B</pcolor>
+    <scolor>#1A73E8</scolor>
+    <shade_type>solid</shade_type>
+  </wallpaper>
+</wallpapers>
+XML_EOF
+
+    # Document d'installation
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/doc/${pkgname}/README" << 'README_EOF'
+nemOS-Wallpapers - Fonds d'écran pour nemOS
+=============================================
+
+Collection de fonds d'écran pour la distribution nemOS.
+Style : Dégradés bleu nuit vers bleu électrique.
+
+Fonds d'écran inclus :
+  - nemos-default.png  : Fond d'écran par défaut (dégradé bleu nuit)
+  - nemos-dark.png     : Variante sombre profonde
+  - nemos-sunset.png   : Dégradé coucher de soleil bleu-violet
+  - nemos-ocean.png    : Thème océanique bleu profond
+  - nemos-minimal.png  : Fond minimaliste épuré
+
+Emplacements d'installation :
+  - /usr/share/backgrounds/nemOS/     : Tous les fonds d'écran
+  - /usr/share/backgrounds/nemOS.xml : Métadonnées GNOME/KDE
+  - /usr/share/backgrounds/nemOS-default.png : Lien vers le fond par défaut
+
+Configuration pour les gestionnaires d'affichage :
+  - LightDM : Configurer dans /etc/lightdm/lightdm-gtk-greeter.conf
+    background=/usr/share/backgrounds/nemOS/nemos-default.png
+
+  - SDDM : Configurer dans /etc/sddm.conf
+    [Theme]
+    Current=nemOS
+
+Pour définir le fond d'écran depuis OpenBox :
+  feh --bg-scale /usr/share/backgrounds/nemOS/nemos-default.png
+README_EOF
+
+    # Permissions
+    find "${pkgdir}" -type d -exec chmod 755 {} \;
+    find "${pkgdir}" -type f -exec chmod 644 {} \;
+
+    echo "  -> Paquet ${pkgname}-${pkgver}-${pkgrel} prêt."
+}

@@ -1,0 +1,483 @@
+# Mainteneur : nemOS <contact@nemos.dev>
+# Paquet : nemos-store
+# Boutique d'applications nemOS avec interface style App Store
+
+pkgname=nemos-store
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Boutique d'applications nemOS - Interface style App Store"
+arch=('i686' 'x86_64')
+url="https://nemos.dev"
+license=('GPL-3.0-or-later')
+depends=(
+    'python'
+    'python-gobject'
+    'gtk3'
+    'pacman'
+    'polkit'
+)
+optdepends=(
+    'pamac-aur: pour le support AUR'
+    'flatpak: pour le support des applications Flatpak'
+    'gnome-keyring: pour le stockage sécurisé des mots de passe'
+)
+makedepends=()
+provides=('nemos-app-store')
+conflicts=('nemos-app-store')
+replaces=('nemos-app-store')
+options=('!strip' '!debug')
+install=${pkgname}.install
+
+# Sources locales depuis le dépôt nemos-store
+source=(
+    "nemos-store.py"
+    "package-catalog.json"
+    "nemos-store.desktop"
+    "nemos-store.svg"
+)
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+package() {
+    # Répertoire de l'application
+    local appdir="${pkgdir}/usr/lib/nemos-store"
+    mkdir -p "${appdir}"
+
+    # --- Application principale ---
+    echo "  -> Installation de l'application nemOS Store..."
+
+    # Script Python principal
+    if [ -f "${srcdir}/nemos-store.py" ]; then
+        install -Dm755 "${srcdir}/nemos-store.py" "${appdir}/nemos-store.py"
+        echo "     -> nemos-store.py"
+    else
+        # Créer un script stub si la source n'est pas disponible
+        install -Dm755 /dev/stdin "${appdir}/nemos-store.py" << 'STORE_EOF'
+#!/usr/bin/env python3
+# nemOS Store - Boutique d'applications nemOS
+# Interface GTK3 style App Store
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GObject, GLib, Pango
+import os
+import sys
+import json
+import subprocess
+import threading
+
+# Chemins de configuration
+CATALOG_PATH = "/usr/lib/nemos-store/package-catalog.json"
+ICON_PATH = "/usr/share/icons/hicolor/scalable/apps/nemos-store.svg"
+PKG_VERSION = "1.0.0"
+
+class NemOSStore(Gtk.Application):
+    """Boutique d'applications nemOS - Fenêtre principale"""
+
+    def __init__(self):
+        super().__init__(
+            application_id='dev.nemos.Store',
+            flags=Gio.ApplicationFlags.FLAGS_NONE
+        )
+        self.catalog = {}
+        self.search_filter = ""
+
+    def do_activate(self):
+        """Création et affichage de la fenêtre principale"""
+        win = NemOSStoreWindow(self)
+        win.set_application(self)
+        win.show_all()
+
+class NemOSStoreWindow(Gtk.ApplicationWindow):
+    """Fenêtre principale de la boutique nemOS"""
+
+    def __init__(self, app):
+        super().__init__(application=app)
+        self.set_title("nemOS Store")
+        self.set_default_size(900, 650)
+        self.set_position(Gtk.WindowPosition.CENTER)
+        self.set_icon_name("nemos-store")
+
+        # Charger le catalogue de paquets
+        self.catalog = self._load_catalog()
+
+        # Construction de l'interface
+        self._build_ui()
+
+    def _load_catalog(self):
+        """Charger le catalogue de paquets depuis le fichier JSON"""
+        try:
+            with open(CATALOG_PATH, 'r') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return {"categories": [], "packages": []}
+
+    def _build_ui(self):
+        """Construire l'interface utilisateur complète"""
+        # Conteneur principal
+        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        self.add(main_box)
+
+        # Barre d'en-tête
+        header = Gtk.HeaderBar()
+        header.set_show_close_button(True)
+        header.set_title("nemOS Store")
+        header.set_subtitle(f"v{PKG_VERSION}")
+        self.set_titlebar(header)
+
+        # Barre de recherche
+        search_entry = Gtk.SearchEntry()
+        search_entry.set_placeholder_text("Rechercher des applications...")
+        search_entry.set_hexpand(True)
+        search_entry.connect("search-changed", self._on_search)
+        header.pack_start(search_entry)
+
+        # Bouton d'actualisation
+        refresh_btn = Gtk.Button()
+        refresh_btn.set_tooltip_text("Actualiser le catalogue")
+        refresh_icon = Gtk.Image.new_from_icon_name("view-refresh", Gtk.IconSize.BUTTON)
+        refresh_btn.set_image(refresh_icon)
+        refresh_btn.connect("clicked", self._on_refresh)
+        header.pack_end(refresh_btn)
+
+        # Panneau de contenu
+        content = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
+        main_box.pack_start(content, True, True, 0)
+
+        # Panneau latéral (catégories)
+        sidebar = self._build_sidebar()
+        content.pack1(sidebar, False, False)
+
+        # Zone principale (liste de paquets)
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        content.pack2(scroll, True, False)
+
+        self.package_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        self.package_list.set_margin_start(16)
+        self.package_list.set_margin_end(16)
+        self.package_list.set_margin_top(16)
+        self.package_list.set_margin_bottom(16)
+        scroll.add(self.package_list)
+
+        # Remplir la liste
+        self._populate_packages()
+
+        # Barre de statut
+        statusbar = Gtk.Statusbar()
+        statusbar.push(0, "Prêt - nemOS Store v" + PKG_VERSION)
+        main_box.pack_end(statusbar, False, False, 0)
+
+    def _build_sidebar(self):
+        """Construire le panneau latéral des catégories"""
+        sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        sidebar.set_size_request(180, -1)
+        sidebar.set_margin_top(8)
+        sidebar.set_margin_bottom(8)
+
+        # Titre
+        cat_label = Gtk.Label()
+        cat_label.set_markup('<b>Catégories</b>')
+        cat_label.set_xalign(0)
+        cat_label.set_margin_start(12)
+        sidebar.pack_start(cat_label, False, False, 4)
+
+        # Séparateur
+        sep = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        sidebar.pack_start(sep, False, False, 4)
+
+        # Boutons de catégorie
+        categories = [
+            ("Toutes", "applications-other"),
+            ("Internet", "web-browser"),
+            ("Bureautique", "x-office-document"),
+            ("Multimédia", "multimedia"),
+            ("Graphisme", "image-x-generic"),
+            ("Système", "applications-system"),
+            ("Développement", "applications-development"),
+            ("Jeux", "applications-games"),
+        ]
+
+        self.cat_buttons = []
+        for name, icon_name in categories:
+            btn = Gtk.Button()
+            btn.set_relief(Gtk.ReliefStyle.NONE)
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+            icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU)
+            label = Gtk.Label(name)
+            label.set_xalign(0)
+            box.pack_start(icon, False, False, 0)
+            box.pack_start(label, True, True, 0)
+            btn.add(box)
+            btn.connect("clicked", self._on_category_select, name)
+            sidebar.pack_start(btn, False, False, 0)
+            self.cat_buttons.append((btn, name))
+
+        return sidebar
+
+    def _populate_packages(self, category=None, search=None):
+        """Remplir la liste des paquets"""
+        # Vider la liste actuelle
+        for child in self.package_list.get_children():
+            child.destroy()
+
+        packages = self.catalog.get("packages", [])
+
+        # Filtrer par catégorie
+        if category and category != "Toutes":
+            packages = [p for p in packages if p.get("category") == category]
+
+        # Filtrer par recherche
+        if search:
+            search_lower = search.lower()
+            packages = [p for p in packages
+                       if search_lower in p.get("name", "").lower() or
+                          search_lower in p.get("description", "").lower()]
+
+        # Afficher les paquets
+        if not packages:
+            empty_label = Gtk.Label("Aucune application trouvée")
+            empty_label.get_style_context().add_class("dim-label")
+            self.package_list.pack_start(empty_label, True, True, 0)
+            return
+
+        for pkg in packages:
+            row = self._build_package_row(pkg)
+            self.package_list.pack_start(row, False, False, 0)
+
+        self.package_list.show_all()
+
+    def _build_package_row(self, pkg):
+        """Construire une ligne de paquet dans la liste"""
+        row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        row.set_margin_top(4)
+        row.set_margin_bottom(4)
+
+        # Icône
+        icon = Gtk.Image.new_from_icon_name(pkg.get("icon", "package-x-generic"),
+                                             Gtk.IconSize.DIALOG)
+        row.pack_start(icon, False, False, 0)
+
+        # Informations
+        info = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        name_label = Gtk.Label()
+        name_label.set_markup(f'<b>{pkg.get("name", "Inconnu")}</b>')
+        name_label.set_xalign(0)
+        info.pack_start(name_label, False, False, 0)
+
+        desc_label = Gtk.Label(pkg.get("description", ""))
+        desc_label.set_xalign(0)
+        desc_label.get_style_context().add_class("dim-label")
+        desc_label.set_ellipsize(Pango.EllipsizeMode.END)
+        info.pack_start(desc_label, False, False, 0)
+
+        row.pack_start(info, True, True, 0)
+
+        # Bouton d'installation
+        install_btn = Gtk.Button(label="Installer")
+        install_btn.set_valign(Gtk.Align.CENTER)
+        install_btn.connect("clicked", self._on_install, pkg)
+        row.pack_end(install_btn, False, False, 0)
+
+        return row
+
+    def _on_search(self, entry):
+        """Recherche d'applications"""
+        self._populate_packages(search=entry.get_text())
+
+    def _on_category_select(self, button, category):
+        """Sélection d'une catégorie"""
+        self._populate_packages(category=category)
+
+    def _on_refresh(self, button):
+        """Actualiser le catalogue"""
+        self.catalog = self._load_catalog()
+        self._populate_packages()
+
+    def _on_install(self, button, pkg):
+        """Installer un paquet"""
+        pkg_name = pkg.get("pkgname", pkg.get("name", ""))
+        button.set_sensitive(False)
+        button.set_label("Installation...")
+
+        def do_install():
+            try:
+                subprocess.run(
+                    ["pkexec", "pacman", "-S", "--noconfirm", pkg_name],
+                    check=True, capture_output=True, text=True
+                )
+                GLib.idle_add(lambda: button.set_label("Installé ✓"))
+            except subprocess.CalledProcessError:
+                GLib.idle_add(lambda: button.set_label("Erreur ✗"))
+                GLib.idle_add(lambda: button.set_sensitive(True))
+
+        threading.Thread(target=do_install, daemon=True).start()
+
+
+def main():
+    """Point d'entrée principal de nemOS Store"""
+    app = NemOSStore()
+    return app.run(sys.argv)
+
+if __name__ == '__main__':
+    sys.exit(main())
+STORE_EOF
+        echo "     -> nemos-store.py (généré)"
+    fi
+
+    # Catalogue de paquets
+    if [ -f "${srcdir}/package-catalog.json" ]; then
+        install -Dm644 "${srcdir}/package-catalog.json" "${appdir}/package-catalog.json"
+        echo "     -> package-catalog.json"
+    else
+        # Catalogue par défaut
+        install -Dm644 /dev/stdin "${appdir}/package-catalog.json" << 'CATALOG_EOF'
+{
+    "version": "1.0.0",
+    "name": "nemOS Package Catalog",
+    "categories": [
+        {"id": "internet", "name": "Internet", "icon": "web-browser"},
+        {"id": "office", "name": "Bureautique", "icon": "x-office-document"},
+        {"id": "multimedia", "name": "Multimédia", "icon": "multimedia"},
+        {"id": "graphics", "name": "Graphisme", "icon": "image-x-generic"},
+        {"id": "system", "name": "Système", "icon": "applications-system"},
+        {"id": "dev", "name": "Développement", "icon": "applications-development"},
+        {"id": "games", "name": "Jeux", "icon": "applications-games"}
+    ],
+    "packages": [
+        {
+            "name": "Firefox ESR",
+            "pkgname": "firefox-esr",
+            "description": "Navigateur web sécurisé et stable",
+            "category": "internet",
+            "icon": "firefox-esr",
+            "version": "latest"
+        },
+        {
+            "name": "LibreOffice",
+            "pkgname": "libreoffice-fresh",
+            "description": "Suite bureautique complète",
+            "category": "office",
+            "icon": "libreoffice-main",
+            "version": "latest"
+        },
+        {
+            "name": "VLC",
+            "pkgname": "vlc",
+            "description": "Lecteur multimédia universel",
+            "category": "multimedia",
+            "icon": "vlc",
+            "version": "latest"
+        },
+        {
+            "name": "GIMP",
+            "pkgname": "gimp",
+            "description": "Éditeur d'images professionnel",
+            "category": "graphics",
+            "icon": "gimp",
+            "version": "latest"
+        },
+        {
+            "name": "Geany",
+            "pkgname": "geany",
+            "description": "Éditeur de code léger",
+            "category": "dev",
+            "icon": "geany",
+            "version": "latest"
+        },
+        {
+            "name": "GParted",
+            "pkgname": "gparted",
+            "description": "Éditeur de partitions graphique",
+            "category": "system",
+            "icon": "gparted",
+            "version": "latest"
+        }
+    ]
+}
+CATALOG_EOF
+        echo "     -> package-catalog.json (généré)"
+    fi
+
+    # --- Fichier desktop ---
+    echo "  -> Installation du fichier .desktop..."
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/applications/nemos-store.desktop" << 'DESKTOP_EOF'
+[Desktop Entry]
+Name=nemOS Store
+Comment=Boutique d'applications nemOS
+Comment[fr]=Boutique d'applications nemOS
+Exec=/usr/lib/nemos-store/nemos-store.py
+Icon=nemos-store
+Type=Application
+Categories=System;PackageManager;
+Keywords=store;app;install;paquet;boutique;
+StartupNotify=true
+StartupWMClass=nemos-store
+Terminal=false
+DESKTOP_EOF
+
+    # --- Icône ---
+    echo "  -> Installation de l'icône..."
+    if [ -f "${srcdir}/nemos-store.svg" ]; then
+        install -Dm644 "${srcdir}/nemos-store.svg" \
+            "${pkgdir}/usr/share/icons/hicolor/scalable/apps/nemos-store.svg"
+        echo "     -> nemos-store.svg"
+    fi
+
+    # --- Lien symbolique pour l'exécutable ---
+    echo "  -> Création du lien d'exécution..."
+    mkdir -p "${pkgdir}/usr/bin"
+    ln -sf "/usr/lib/nemos-store/nemos-store.py" \
+           "${pkgdir}/usr/bin/nemos-store"
+
+    # --- Politique PolicyKit ---
+    echo "  -> Installation des règles PolicyKit..."
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/polkit-1/rules.d/50-nemos-store.rules" << 'POLKIT_EOF'
+// Règles PolicyKit pour nemOS Store
+// Permet l'installation de paquets via l'interface graphique
+
+polkit.addRule(function(action, subject) {
+    // Autoriser l'installation de paquets pour les utilisateurs du groupe wheel
+    if (action.id.indexOf("org.freedesktop.packagekit.") === 0 ||
+        action.id === "org.archlinux.pacman.install" ||
+        action.id === "org.archlinux.pacman.remove") {
+        if (subject.isInGroup("wheel")) {
+            return polkit.Result.YES;
+        }
+    }
+});
+POLKIT_EOF
+
+    # Permissions
+    find "${pkgdir}" -type d -exec chmod 755 {} \;
+    find "${pkgdir}" -type f -exec chmod 644 {} \;
+    chmod 755 "${appdir}/nemos-store.py" 2>/dev/null || true
+
+    # Document
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/doc/${pkgname}/README" << 'README_EOF'
+nemOS-Store - Boutique d'applications nemOS
+============================================
+
+Interface graphique de gestion de paquets pour nemOS.
+Style inspiré de l'App Store macOS.
+
+Fonctionnalités :
+  - Recherche de paquets
+  - Navigation par catégories
+  - Installation/uninstallation via pacman
+  - Support AUR (via pamac)
+  - Support Flatpak
+
+Démarrage :
+  - Menu : Applications > Système > nemOS Store
+  - Terminal : nemos-store
+  - Raccourci : Alt+F2 > nemos-store
+
+Fichier de catalogue :
+  /usr/lib/nemos-store/package-catalog.json
+
+Pour ajouter des paquets au catalogue, éditer le fichier JSON
+et ajouter une entrée dans le tableau "packages".
+README_EOF
+
+    echo "  -> Paquet ${pkgname}-${pkgver}-${pkgrel} prêt."
+}

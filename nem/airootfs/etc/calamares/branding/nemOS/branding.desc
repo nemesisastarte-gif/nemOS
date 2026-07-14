@@ -1,0 +1,74 @@
+---
+# Configuration de l'identité visuelle - nemOS
+# Branding descriptor pour Calamares
+
+# Informations produit
+productName:       nemOS
+version:           1.0.0
+shortVersion:      "1.0"
+versionedName:     nemOS 1.0.0 "Aube"
+shortDescription:  "La puissance de Linux, l'élégance de macOS"
+
+# Chemins des images
+# L'image d'en-tête (bandeau supérieur)
+headerImage:       "nemos-logo.png"
+# Le logo produit (affiché dans la barre latérale)
+productLogo:       "/usr/share/pixmaps/nemos-logo.png"
+# Papier peint d'arrière-plan
+wallpaper:         "/usr/share/backgrounds/nemos-default.png"
+# Logo pour le chargeur d'amorçage
+# bootloaderEntryName: "nemOS"
+
+# Apparence de la barre latérale
+sidebar:
+  # Utiliser une couleur unie au lieu d'une image
+  textColor:       "#CDD6F4"
+  background:      "#0A1628"
+
+# Feuille de style CSS personnalisée
+style:
+  stylesheet:      "stylesheet.css"
+  sidebarBackground: "#11111B"
+  sidebarText:      "#CDD6F4"
+  sidebarTextSelect: "#1A73E8"
+
+# URLs (optionnel)
+# supportUrl:        "https://nemos.example.com/support"
+# knownIssuesUrl:   "https://nemos.example.com/known-issues"
+# releaseNotesUrl:  "https://nemos.example.com/release-notes"
+# donateUrl:        "https://nemos.example.com/donate"
+
+# -------------------------------------------------------------------
+#  Textes affichés dans l'installeur (en français)
+# -------------------------------------------------------------------
+
+# Page d'accueil
+strings:
+  # Boutons de navigation et messages génériques
+  bootloaderEntryName: "nemOS"
+
+  # Page de fin
+  finished:
+    # Le texte affiché quand l'installation est terminée
+    restartNow:        "Redémarrer maintenant"
+    restartNowTooltip: "Cliquez pour redémarrer l'ordinateur"
+    quitNow:           "Quitter l'installateur"
+
+  # Page d'accueil
+  welcome:
+    # Titre de la page de bienvenue
+    welcomeText:
+      # Dépend de l'existence d'un support URL ci-dessus
+      "<h3>Bienvenue dans l'installateur de nemOS</h3>
+       <p>Cet assistant vous guidera tout au long de l'installation de
+       <strong>nemOS 1.0.0 &quot;Aube&quot;</strong> sur votre ordinateur.</p>
+       <p>nemOS est une distribution Linux légère et élégante, optimisée
+       pour les systèmes 32 bits. Profitez de la puissance de Linux
+       avec l'élégance de macOS.</p>"
+
+# -------------------------------------------------------------------
+#  Slides de la page de fin (affichés après installation)
+# -------------------------------------------------------------------
+slideshow:               "show"
+slideshowPath:           "/etc/calamares/slideshow/"
+slideshowInterface:      "qml"

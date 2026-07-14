@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- nemOS Openbox Configuration - macOS-like lightweight desktop -->
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+
+  <!-- Resistance: how much resistance (in pixels) there is between windows -->
+  <resistance>
+    <strength>10</strength>
+    <screen_edge_strength>20</screen_edge_strength>
+  </resistance>
+
+  <!-- Focus: focus-follows-mouse for macOS-like behavior -->
+  <focus>
+    <focusNew>yes</focusNew>
+    <!-- Always give focus to new windows -->
+    <followMouse>yes</followMouse>
+    <focusLast>yes</focusLast>
+    <underMouse>yes</underMouse>
+    <focusDelay>200</focusDelay>
+    <raiseOnFocus>no</raiseOnFocus>
+  </focus>
+
+  <!-- Placement: smart/cascade placement -->
+  <placement>
+    <policy>Smart</policy>
+    <center>yes</center>
+    <monitor>Primary</monitor>
+    <primaryMonitor>1</primaryMonitor>
+  </placement>
+
+  <!-- Theme and appearance -->
+  <theme>
+    <name>NemOS-Dark</name>
+    <titleLayout>NLIMC</titleLayout>
+    <!-- N: icon, L: label (window title), I: iconify, M: maximize, C: close -->
+    <keepBorder>yes</keepBorder>
+    <animateIconify>no</animateIconify>
+    <font place="ActiveWindow">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>Normal</weight>
+      <slant>Normal</slant>
+    </font>
+    <font place="InactiveWindow">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>Normal</weight>
+      <slant>Normal</slant>
+    </font>
+    <font place="MenuHeader">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>Bold</weight>
+      <slant>Normal</slant>
+    </font>
+    <font place="MenuItem">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>Normal</weight>
+      <slant>Normal</slant>
+    </font>
+    <font place="ActiveOnScreenDisplay">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>Bold</weight>
+      <slant>Normal</slant>
+    </font>
+    <font place="InactiveOnScreenDisplay">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>Bold</weight>
+      <slant>Normal</slant>
+    </font>
+  </theme>
+
+  <!-- Desktops: 4 virtual desktops -->
+  <desktops>
+    <number>4</number>
+    <firstdesk>1</firstdesk>
+    <names>
+      <name>Bureau 1</name>
+      <name>Bureau 2</name>
+      <name>Bureau 3</name>
+      <name>Bureau 4</name>
+    </names>
+    <popupTime>875</popupTime>
+  </desktops>
+
+  <!-- Resize and move -->
+  <resize>
+    <drawContents>yes</drawContents>
+    <popupShow>Nonpixel</popupShow>
+    <popupPosition>Center</popupPosition>
+    <popupFixedPosition>
+      <x>10</x>
+      <y>10</y>
+    </popupFixedPosition>
+  </resize>
+
+  <!-- Margins: leave space for tint2 top bar (28px) and plank dock at bottom (~60px) -->
+  <margins>
+    <top>28</top>
+    <bottom>4</bottom>
+    <left>0</left>
+    <right>0</right>
+  </margins>
+
+  <!-- Applications: per-app window rules for macOS-like behavior -->
+  <applications>
+
+    <!-- No titlebar by default for most windows (decorations off) -->
+    <!-- Plank dock - no decorations, skip taskbar -->
+    <application name="plank" class="Plank">
+      <decor>no</decor>
+      <skip_taskbar>yes</skip_taskbar>
+      <skip_pager>yes</skip_pager>
+      <layer>above</layer>
+    </application>
+
+    <!-- Tint2 panel - no decorations, skip taskbar -->
+    <application name="tint2" class="Tint2">
+      <decor>no</decor>
+      <skip_taskbar>yes</skip_taskbar>
+      <skip_pager>yes</skip_pager>
+      <layer>above</layer>
+      <position force="no">
+        <x>0</x>
+        <y>0</y>
+      </position>
+    </application>
+
+    <!-- Rofi - no decorations, centered -->
+    <application name="rofi" class="Rofi">
+      <decor>no</decor>
+      <skip_taskbar>yes</skip_taskbar>
+      <skip_pager>yes</skip_pager>
+      <layer>above</layer>
+    </application>
+
+    <!-- Firefox - show short titlebar -->
+    <application name="firefox-esr" class="Firefox-esr" type="normal">
+      <decor>yes</decor>
+      <maximized>no</maximized>
+    </application>
+
+    <application name="Navigator" class="Firefox" type="normal">
+      <decor>yes</decor>
+      <maximized>no</maximized>
+    </application>
+
+    <!-- Thunar file manager - show titlebar -->
+    <application name="Thunar" class="Thunar" type="normal">
+      <decor>yes</decor>
+      <maximized>no</maximized>
+    </application>
+
+    <!-- Terminal - no titlebar by default for clean look -->
+    <application name="xfce4-terminal" class="Xfce4-terminal" type="normal">
+      <decor>no</decor>
+      <maximized>no</maximized>
+    </application>
+
+    <!-- Geany editor - show short titlebar -->
+    <application name="geany" class="Geany" type="normal">
+      <decor>yes</decor>
+      <maximized>no</maximized>
+    </application>
+
+    <!-- LibreOffice - show titlebar -->
+    <application name="libreoffice" class="Libreoffice" type="normal">
+      <decor>yes</decor>
+      <maximized>no</maximized>
+    </application>
+
+    <!-- VLC - no titlebar -->
+    <application name="vlc" class="Vlc" type="normal">
+      <decor>no</decor>
+      <maximized>no</maximized>
+    </application>
+
+    <!-- Dialog windows - always show decorations -->
+    <application type="dialog">
+      <decor>yes</decor>
+      <center>yes</center>
+      <layer>above</layer>
+      <focus>yes</focus>
+    </application>
+
+    <!-- Splash screens - no decorations -->
+    <application type="splash">
+      <decor>no</decor>
+      <skip_taskbar>yes</skip_taskbar>
+      <skip_pager>yes</skip_pager>
+      <layer>above</layer>
+    </application>
+
+    <!-- Utility windows (tooltips etc) -->
+    <application type="utility">
+      <decor>no</decor>
+      <skip_taskbar>yes</skip_taskbar>
+      <skip_pager>yes</skip_pager>
+      <layer>above</layer>
+    </application>
+
+  </applications>
+
+  <!-- Window keyboard shortcuts -->
+  <keyboard>
+    <chainQuitKey>C-g</chainQuitKey>
+
+    <!-- Alt+F4: Close window -->
+    <keybind key="A-F4">
+      <action name="Close"/>
+    </keybind>
+
+    <!-- Alt+Tab: Alt-tab (cycle through windows) -->
+    <keybind key="A-Tab">
+      <action name="NextWindow">
+        <finalactions>
+          <action name="Focus"/>
+          <action name="Raise"/>
+          <action name="Unshade"/>
+        </finalactions>
+      </action>
+    </keybind>
+
+    <!-- Alt+Shift+Tab: Previous window -->
+    <keybind key="A-Shift-Tab">
+      <action name="PreviousWindow">
+        <finalactions>
+          <action name="Focus"/>
+          <action name="Raise"/>
+          <action name="Unshade"/>
+        </finalactions>
+      </action>
+    </keybind>
+
+    <!-- Super+D: Show/Hide Desktop -->
+    <keybind key="W-d">
+      <action name="ToggleShowDesktop"/>
+    </keybind>
+
+    <!-- Super+L: Lock screen -->
+    <keybind key="W-l">
+      <action name="Execute">
+        <command>light-locker-command -l</command>
+      </action>
+    </keybind>
+
+    <!-- Super+T: Open terminal -->
+    <keybind key="W-t">
+      <action name="Execute">
+        <command>xfce4-terminal</command>
+      </action>
+    </keybind>
+
+    <!-- Super+Space: App launcher (rofi) -->
+    <keybind key="W-space">
+      <action name="Execute">
+        <command>rofi -show drun -theme ~/.config/rofi/config.rasi</command>
+      </action>
+    </keybind>
+
+    <!-- Super+F: File manager (Thunar) -->
+    <keybind key="W-f">
+      <action name="Execute">
+        <command>thunar</command>
+      </action>
+    </keybind>
+
+    <!-- Super+E: File manager (Thunar) - alternate -->
+    <keybind key="W-e">
+      <action name="Execute">
+        <command>thunar</command>
+      </action>
+    </keybind>
+
+    <!-- Super+Return: Open terminal - alternate -->
+    <keybind key="W-Return">
+      <action name="Execute">
+        <command>xfce4-terminal</command>
+      </action>
+    </keybind>
+
+    <!-- Alt+F2: Run dialog (rofi) -->
+    <keybind key="A-F2">
+      <action name="Execute">
+        <command>rofi -show run -theme ~/.config/rofi/config.rasi</command>
+      </action>
+    </keybind>
+
+    <!-- Window management keybindings -->
+
+    <!-- Alt+Drag: Move window -->
+    <keybind key="A-Left">
+      <action name="MoveToEdgeWest"/>
+    </keybind>
+    <keybind key="A-Right">
+      <action name="MoveToEdgeEast"/>
+    </keybind>
+    <keybind key="A-Up">
+      <action name="MoveToEdgeNorth"/>
+    </keybind>
+    <keybind key="A-Down">
+      <action name="MoveToEdgeSouth"/>
+    </keybind>
+
+    <!-- Super+Left: Tile left half -->
+    <keybind key="W-Left">
+      <action name="UnmaximizeFull"/>
+      <action name="MoveResizeTo">
+        <x>0</x>
+        <y>28</y>
+        <width>50%</width>
+        <height>calc(-60px-2*0)</height>
+      </action>
+    </keybind>
+
+    <!-- Super+Right: Tile right half -->
+    <keybind key="W-Right">
+      <action name="UnmaximizeFull"/>
+      <action name="MoveResizeTo">
+        <x>-0</x>
+        <y>28</y>
+        <width>50%</width>
+        <height>calc(-60px-2*0)</height>
+      </action>
+    </keybind>
+
+    <!-- Super+Up: Maximize -->
+    <keybind key="W-Up">
+      <action name="Maximize"/>
+    </keybind>
+
+    <!-- Super+Down: Unmaximize / Minimize -->
+    <keybind key="W-Down">
+      <action name="UnmaximizeFull"/>
+    </keybind>
+    <keybind key="W-Down" chain="true">
+      <action name="Iconify"/>
+    </keybind>
+
+    <!-- Alt+F5 or Alt+F9: Unmaximize -->
+    <keybind key="A-F5">
+      <action name="UnmaximizeFull"/>
+    </keybind>
+
+    <!-- Alt+F7: Begin move -->
+    <keybind key="A-F7">
+      <action name="Move"/>
+    </keybind>
+
+    <!-- Alt+F8: Begin resize -->
+    <keybind key="A-F8">
+      <action name="Resize"/>
+    </keybind>
+
+    <!-- Alt+F9: Iconify (minimize) -->
+    <keybind key="A-F9">
+      <action name="Iconify"/>
+    </keybind>
+
+    <!-- Alt+F10: Maximize -->
+    <keybind key="A-F10">
+      <action name="ToggleMaximizeFull"/>
+    </keybind>
+
+    <!-- Alt+Space: Show window menu -->
+    <keybind key="A-space">
+      <action name="ShowMenu">
+        <menu>client-menu</menu>
+      </action>
+    </keybind>
+
+    <!-- Super+1-4: Switch to desktop 1-4 -->
+    <keybind key="W-1">
+      <action name="GoToDesktop">
+        <to>1</to>
+      </action>
+    </keybind>
+    <keybind key="W-2">
+      <action name="GoToDesktop">
+        <to>2</to>
+      </action>
+    </keybind>
+    <keybind key="W-3">
+      <action name="GoToDesktop">
+        <to>3</to>
+      </action>
+    </keybind>
+    <keybind key="W-4">
+      <action name="GoToDesktop">
+        <to>4</to>
+      </action>
+    </keybind>
+
+    <!-- Super+Shift+1-4: Send window to desktop 1-4 -->
+    <keybind key="W-Shift-1">
+      <action name="SendToDesktop">
+        <to>1</to>
+      </action>
+    </keybind>
+    <keybind key="W-Shift-2">
+      <action name="SendToDesktop">
+        <to>2</to>
+      </action>
+    </keybind>
+    <keybind key="W-Shift-3">
+      <action name="SendToDesktop">
+        <to>3</to>
+      </action>
+    </keybind>
+    <keybind key="W-Shift-4">
+      <action name="SendToDesktop">
+        <to>4</to>
+      </action>
+    </keybind>
+
+    <!-- Ctrl+Alt+Left/Right: Switch desktop -->
+    <keybind key="C-A-Left">
+      <action name="GoToDesktop">
+        <to>left</to>
+      </action>
+    </keybind>
+    <keybind key="C-A-Right">
+      <action name="GoToDesktop">
+        <to>right</to>
+      </action>
+    </keybind>
+
+    <!-- Super+Tab: Desktop switcher (rofi) -->
+    <keybind key="W-Tab">
+      <action name="Execute">
+        <command>rofi -show window -theme ~/.config/rofi/config.rasi</command>
+      </action>
+    </keybind>
+
+    <!-- Super+M: Mute/Unmute volume -->
+    <keybind key="W-m">
+      <action name="Execute">
+        <command>amixer set Master toggle</command>
+      </action>
+    </keybind>
+
+    <!-- Volume keys -->
+    <keybind key="XF86AudioRaiseVolume">
+      <action name="Execute">
+        <command>amixer set Master 5%+</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioLowerVolume">
+      <action name="Execute">
+        <command>amixer set Master 5%-</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioMute">
+      <action name="Execute">
+        <command>amixer set Master toggle</command>
+      </action>
+    </keybind>
+
+    <!-- Brightness keys -->
+    <keybind key="XF86MonBrightnessUp">
+      <action name="Execute">
+        <command>xbacklight -inc 10</command>
+      </action>
+    </keybind>
+    <keybind key="XF86MonBrightnessDown">
+      <action name="Execute">
+        <command>xbacklight -dec 10</command>
+      </action>
+    </keybind>
+
+    <!-- Print: Screenshot -->
+    <keybind key="Print">
+      <action name="Execute">
+        <command>xfce4-screenshooter -f</command>
+      </action>
+    </keybind>
+    <keybind key="A-Print">
+      <action name="Execute">
+        <command>xfce4-screenshooter -w</command>
+      </action>
+    </keybind>
+
+    <!-- Super+Q: Close window (macOS-like) -->
+    <keybind key="W-q">
+      <action name="Close"/>
+    </keybind>
+
+    <!-- Super+W: Show all windows (overview-like) -->
+    <keybind key="W-w">
+      <action name="Execute">
+        <command>rofi -show windowcd -theme ~/.config/rofi/config.rasi</command>
+      </action>
+    </keybind>
+
+  </keyboard>
+
+  <!-- Mouse bindings -->
+  <mouse>
+    <dragThreshold>8</dragThreshold>
+
+    <!-- Double click on titlebar -->
+    <doubleClickDelay>200</doubleClickDelay>
+
+    <!-- Mouse drag: use Alt+click to move, Alt+right-click to resize (macOS-like) -->
+    <context name="Frame">
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Move"/>
+      </mousebind>
+      <mousebind button="A-Right" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Right" action="Drag">
+        <action name="Resize"/>
+      </mousebind>
+      <mousebind button="A-Middle" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Middle" action="Drag">
+        <action name="Move"/>
+      </mousebind>
+    </context>
+
+    <context name="Titlebar">
+      <mousebind button="Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="Left" action="Drag">
+        <action name="Move"/>
+      </mousebind>
+      <mousebind button="Left" action="DoubleClick">
+        <action name="ToggleMaximizeFull"/>
+      </mousebind>
+      <mousebind button="Right" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+        <action name="ShowMenu">
+          <menu>client-menu</menu>
+        </action>
+      </mousebind>
+      <mousebind button="Middle" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="Middle" action="Drag">
+        <action name="Move"/>
+      </mousebind>
+    </context>
+
+    <context name="Title">
+      <mousebind button="Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="Left" action="Drag">
+        <action name="Move"/>
+      </mousebind>
+      <mousebind button="Left" action="DoubleClick">
+        <action name="ToggleMaximizeFull"/>
+      </mousebind>
+      <mousebind button="Right" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+        <action name="ShowMenu">
+          <menu>client-menu</menu>
+        </action>
+      </mousebind>
+    </context>
+
+    <context name="Close">
+      <mousebind button="Left" action="Click">
+        <action name="Close"/>
+      </mousebind>
+    </context>
+
+    <context name="Maximize">
+      <mousebind button="Left" action="Click">
+        <action name="ToggleMaximizeFull"/>
+      </mousebind>
+    </context>
+
+    <context name="Minimize">
+      <mousebind button="Left" action="Click">
+        <action name="Iconify"/>
+      </mousebind>
+    </context>
+
+    <context name="Iconify">
+      <mousebind button="Left" action="Click">
+        <action name="Iconify"/>
+      </mousebind>
+    </context>
+
+    <context name="AllDesktops">
+      <mousebind button="Left" action="Click">
+        <action name="ToggleOmnipresent"/>
+      </mousebind>
+    </context>
+
+    <context name="Shade">
+      <mousebind button="Left" action="Click">
+        <action name="ToggleShade"/>
+      </mousebind>
+    </context>
+
+    <!-- Window borders for resize -->
+    <context name="Border">
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Resize"/>
+      </mousebind>
+    </context>
+
+    <context name="TLCorner">
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Resize"/>
+      </mousebind>
+    </context>
+
+    <context name="TRCorner">
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Resize"/>
+      </mousebind>
+    </context>
+
+    <context name="BLCorner">
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Resize"/>
+      </mousebind>
+    </context>
+
+    <context name="BRCorner">
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Resize"/>
+      </mousebind>
+    </context>
+
+    <!-- Client (inside window) -->
+    <context name="Client">
+      <mousebind button="Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Left" action="Drag">
+        <action name="Move"/>
+      </mousebind>
+      <mousebind button="A-Right" action="Press">
+        <action name="Focus"/>
+        <action name="Raise"/>
+      </mousebind>
+      <mousebind button="A-Right" action="Drag">
+        <action name="Resize"/>
+      </mousebind>
+    </context>
+
+    <!-- Root (desktop background) -->
+    <context name="Root">
+      <!-- Right click on desktop shows menu -->
+      <mousebind button="Right" action="Press">
+        <action name="ShowMenu">
+          <menu>root-menu</menu>
+        </action>
+      </mousebind>
+      <!-- Middle click on desktop for nothing / could add launcher -->
+      <mousebind button="Middle" action="Press">
+        <action name="ShowMenu">
+          <menu>root-menu</menu>
+        </action>
+      </mousebind>
+    </context>
+
+  </mouse>
+
+  <!-- Menus -->
+  <menu>
+    <!-- You can place this file at: ~/.config/openbox/menu.xml -->
+    <file>menu.xml</file>
+    <hideDelay>200</hideDelay>
+    <middle>no</middle>
+    <submenuShowDelay>100</submenuShowDelay>
+    <submenuHideDelay>400</submenuHideDelay>
+    <showIcons>yes</showIcons>
+    <manageDesktops>yes</manageDesktops>
+  </menu>
+
+  <!-- Miscellaneous -->
+  <misc>
+    <applicationBasedSwitching>yes</applicationBasedSwitching>
+  </misc>
+
+</openbox_config>

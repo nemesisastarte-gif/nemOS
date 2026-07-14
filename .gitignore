@@ -1,0 +1,29 @@
+# Fichiers de construction
+*.iso
+*.sha256
+work/
+out/
+
+# Dépendances
+*.pkg.tar.*
+*.pkg.tar.zst
+
+# Fichiers temporaires
+*.log
+*.tmp
+.cache/
+
+# Éditeur
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Tokens et secrets
+*.token
+.env

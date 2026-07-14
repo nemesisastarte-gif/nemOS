@@ -1,0 +1,12 @@
+[PlankDockPreferences]
+DockItems=
+00E4D336-4A4E-4799-A77A-D3D9E3F24DE9=/usr/share/applications/nemos-store.desktop;
+8628A97B-7C64-4B1E-9D3E-7A42F3B1E2D0=/usr/share/applications/firefox-esr.desktop;
+F15C7B23-8D9A-4F6E-B3C2-1D8E5A7F9C01=/usr/share/applications/thunar.desktop;
+A3E8F2B1-6C9D-4E7A-A5B3-8F1D2C6E9A04=/usr/share/applications/xfce4-terminal.desktop;
+B7A4D6E8-2F1C-4B9A-D7E3-5C8F1A2B6D09=/usr/share/applications/geany.desktop;
+C9F1A3B5-7D2E-4C8B-E6F4-9A1D3B5C7E02=/usr/share/applications/libreoffice-writer.desktop;
+D2B8E5F7-3A6D-4D9C-F1A8-B2C4E6D8F103=/usr/share/applications/vlc.desktop;
+E5C9F1A8-4B7E-4E0D-A2B9-C3D5E7F9A104=/usr/share/applications/xfce4-settings-manager.desktop;
+F8D2A4B6-5C8F-4F1E-B3C0-D4E6F8A1B205=/usr/share/applications/nemos-suspend.desktop;
+A1B3C5D7-6E9F-4A2C-D5E8-F1A3B5C7D206=/usr/share/applications/nemos-logout.desktop;

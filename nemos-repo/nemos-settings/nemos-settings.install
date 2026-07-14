@@ -1,0 +1,25 @@
+# Script de post-installation/pre-désinstallation pour nemos-settings
+
+post_install() {
+    echo "  -> nemos-settings : Mise à jour du cache des applications..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+    echo "  -> nemos-settings : Installation terminée."
+    echo "     Lancez 'nemos-settings' ou cherchez 'Paramètres système' dans le menu."
+}
+
+post_upgrade() {
+    echo "  -> nemos-settings : Mise à jour du cache..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+    echo "  -> nemos-settings : Mise à jour terminée."
+}
+
+pre_remove() {
+    echo "  -> nemos-settings : Suppression en cours..."
+}
+
+post_remove() {
+    echo "  -> nemos-settings : Nettoyage du cache..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+    rm -f /usr/bin/nemos-settings 2>/dev/null || true
+    echo "  -> nemos-settings : Suppression terminée."
+}

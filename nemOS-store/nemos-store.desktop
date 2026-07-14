@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=nemOS Store
+Comment=Boutique d'applications nemOS
+Exec=nemos-store
+Icon=nemos-store
+Type=Application
+Categories=System;PackageManager;
+Keywords=store;app;install;
+StartupNotify=true

@@ -1,0 +1,499 @@
+# Mainteneur : nemOS <contact@nemos.dev>
+# Paquet : nemos-theme
+# Thème GTK personnalisé pour nemOS, inspiré de macOS Mojave Dark
+
+pkgname=nemos-theme
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Thème GTK nemOS-Dark - Inspiré de macOS Mojave Dark"
+arch=('any')
+url="https://nemos.dev"
+license=('GPL-3.0-or-later')
+depends=('gtk-engine-murrine' 'gtk-engines')
+makedepends=()
+provides=('nemos-gtk-theme' 'nemos-dark-theme')
+conflicts=('nemos-gtk-theme' 'nemos-dark-theme')
+replaces=('nemos-gtk-theme')
+options=('!strip')
+
+# Le thème est local dans le dépôt
+# Les fichiers GTK se trouvent dans le sous-répertoire src/
+source=(
+    "gtk-3.0/"
+    "gtk-2.0/"
+    "openbox-3/"
+    "assets/"
+)
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+package() {
+    # Répertoire de destination du thème
+    local themedir="${pkgdir}/usr/share/themes/nemOS-Dark"
+    mkdir -p "${themedir}"
+
+    # --- GTK 3 ---
+    echo "  -> Installation du thème GTK 3..."
+    if [ -d "${srcdir}/gtk-3.0" ]; then
+        cp -r "${srcdir}/gtk-3.0" "${themedir}/"
+        echo "     -> gtk-3.0/ installé"
+    else
+        # Créer un thème GTK 3 minimal par défaut si pas de source
+        mkdir -p "${themedir}/gtk-3.0"
+        cat > "${themedir}/gtk-3.0/gtk.css" << 'GTK3CSS_EOF'
+/* Thème GTK 3 nemOS-Dark - Inspiré de macOS Mojave Dark */
+/* Fallback généré par le PKGBUILD */
+
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-dark.css");
+
+/* Palette de couleurs nemOS */
+@define-color nemos_bg_dark #11111B;
+@define-color nemos_bg_mid #1E1E2E;
+@define-color nemos_bg_light #313244;
+@define-color nemos_text #CDD6F4;
+@define-color nemos_text_dim #A6ADC8;
+@define-color nemos_accent #1A73E8;
+@define-color nemos_accent_hover #4A9AE8;
+@define-color nemos_border #45475A;
+@define-color nemos_selection #1A73E8;
+@define-color nemos_error #F38BA8;
+@define-color nemos_success #A6E3A1;
+@define-color nemos_warning #F9E2AF;
+
+/* Appliquer les couleurs au thème de base */
+* {
+    color: @nemos_text;
+    background-color: @nemos_bg_dark;
+}
+
+window {
+    background-color: @nemos_bg_dark;
+}
+
+headerbar {
+    background-color: @nemos_bg_mid;
+    color: @nemos_text;
+    border-bottom: 1px solid @nemos_border;
+}
+
+button {
+    background-color: @nemos_bg_light;
+    color: @nemos_text;
+    border-radius: 6px;
+    border: 1px solid @nemos_border;
+    min-height: 28px;
+    padding: 4px 12px;
+}
+
+button:hover {
+    background-color: @nemos_accent;
+    color: white;
+    border-color: @nemos_accent;
+}
+
+entry {
+    background-color: @nemos_bg_mid;
+    color: @nemos_text;
+    border: 1px solid @nemos_border;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+entry:focus {
+    border-color: @nemos_accent;
+}
+
+treeview {
+    background-color: @nemos_bg_dark;
+    color: @nemos_text;
+}
+
+treeview:selected {
+    background-color: @nemos_selection;
+    color: white;
+}
+
+scrollbar {
+    background-color: @nemos_bg_dark;
+}
+
+scrollbar slider {
+    background-color: @nemos_bg_light;
+    border-radius: 4px;
+}
+
+scrollbar slider:hover {
+    background-color: @nemos_text_dim;
+}
+
+toolbar {
+    background-color: @nemos_bg_mid;
+}
+
+menubar {
+    background-color: @nemos_bg_mid;
+    color: @nemos_text;
+}
+
+menu {
+    background-color: @nemos_bg_mid;
+    color: @nemos_text;
+    border: 1px solid @nemos_border;
+    border-radius: 6px;
+}
+
+menuitem {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+menuitem:hover {
+    background-color: @nemos_selection;
+    color: white;
+}
+
+tooltip {
+    background-color: @nemos_bg_light;
+    color: @nemos_text;
+    border-radius: 4px;
+}
+
+progressbar {
+    background-color: @nemos_bg_light;
+    border-radius: 4px;
+}
+
+progressbar progress {
+    background-color: @nemos_accent;
+    border-radius: 4px;
+}
+
+switch {
+    background-color: @nemos_bg_light;
+    border-radius: 12px;
+}
+
+switch:checked {
+    background-color: @nemos_accent;
+}
+
+scale trough {
+    background-color: @nemos_bg_light;
+    border-radius: 4px;
+}
+
+scale slider {
+    background-color: @nemos_accent;
+    border-radius: 50%;
+}
+
+selection {
+    background-color: @nemos_selection;
+    color: white;
+}
+GTK3CSS_EOF
+
+        # Fichier sombre (pointe vers le même CSS)
+        ln -sf "gtk.css" "${themedir}/gtk-3.0/gtk-dark.css"
+        echo "     -> gtk-3.0/ créé (fallback)"
+    fi
+
+    # --- GTK 2 ---
+    echo "  -> Installation du thème GTK 2..."
+    if [ -d "${srcdir}/gtk-2.0" ]; then
+        cp -r "${srcdir}/gtk-2.0" "${themedir}/"
+        echo "     -> gtk-2.0/ installé"
+    else
+        # Créer un thème GTK 2 minimal par défaut
+        mkdir -p "${themedir}/gtk-2.0"
+        cat > "${themedir}/gtk-2.0/gtkrc" << 'GTK2RC_EOF'
+# Thème GTK 2 nemOS-Dark - Inspiré de macOS Mojave Dark
+# Fallback généré par le PKGBUILD
+
+gtk-theme-name = "nemOS-Dark"
+gtk-icon-theme-name = "nemOS-Icons"
+
+# Polices
+gtk-font-name = "Noto Sans 11"
+gtk-xft-antialias = 1
+gtk-xft-hinting = 1
+gtk-xft-hintstyle = "hintslight"
+gtk-xft-rgba = "rgb"
+
+# Couleurs
+gtk-color-scheme = "bg_color:#11111B\nfg_color:#CDD6F4\nbase_color:#1E1E2E\ntext_color:#CDD6F4\nselected_bg_color:#1A73E8\nselected_fg_color:#FFFFFF\ntooltip_bg_color:#313244\ntooltip_fg_color:#CDD6F4\nlink_color:#4A9AE8"
+
+# Moteur de rendu
+style "nemos-default" {
+    bg[NORMAL] = @bg_color
+    fg[NORMAL] = @fg_color
+    bg[PRELIGHT] = shade(1.1, @bg_color)
+    fg[PRELIGHT] = @fg_color
+    bg[ACTIVE] = @selected_bg_color
+    fg[ACTIVE] = @selected_fg_color
+    bg[SELECTED] = @selected_bg_color
+    fg[SELECTED] = @selected_fg_color
+    bg[INSENSITIVE] = shade(0.8, @bg_color)
+    fg[INSENSITIVE] = shade(0.5, @fg_color)
+    base[NORMAL] = @base_color
+    text[NORMAL] = @text_color
+    base[ACTIVE] = @selected_bg_color
+    text[ACTIVE] = @selected_fg_color
+    base[SELECTED] = @selected_bg_color
+    text[SELECTED] = @selected_fg_color
+    base[INSENSITIVE] = shade(0.9, @base_color)
+    text[INSENSITIVE] = shade(0.5, @text_color)
+
+    engine "murrine" {
+        roundness = 6
+        focusstyle = 2
+        handlestyle = 1
+        sliderstyle = 0
+        scrollbarstyle = 0
+        reliefstyle = 3
+        gradient_shades = {1.0, 1.0, 1.0, 1.0}
+        contrast = 0.6
+        lightness = 0.0
+    }
+}
+
+style "nemos-wide" = "nemos-default" {
+    xthickness = 2
+    ythickness = 2
+}
+
+style "nemos-wider" = "nemos-default" {
+    xthickness = 3
+    ythickness = 3
+}
+
+style "nemos-button" = "nemos-wide" {
+    bg[NORMAL] = shade(1.1, @bg_color)
+    bg[PRELIGHT] = @selected_bg_color
+    fg[PRELIGHT] = @selected_fg_color
+}
+
+style "nemos-entry" = "nemos-wider" {
+    bg[NORMAL] = @base_color
+    fg[NORMAL] = @text_color
+}
+
+style "nemos-menubar" = "nemos-default" {
+    bg[NORMAL] = shade(1.05, @bg_color)
+}
+
+style "nemos-menuitem" = "nemos-default" {
+    bg[PRELIGHT] = @selected_bg_color
+    fg[PRELIGHT] = @selected_fg_color
+}
+
+style "nemos-scrollbar" = "nemos-default" {
+    bg[NORMAL] = shade(0.9, @bg_color)
+}
+
+style "nemos-progress" = "nemos-wide" {
+    bg[NORMAL] = shade(0.85, @bg_color)
+    bg[PRELIGHT] = shade(0.8, @bg_color)
+}
+
+style "nemos-scale" = "nemos-default" {
+    bg[NORMAL] = shade(0.85, @bg_color)
+}
+
+style "nemos-tooltips" = "nemos-default" {
+    bg[NORMAL] = @tooltip_bg_color
+    fg[NORMAL] = @tooltip_fg_color
+}
+
+class "GtkWidget"           style "nemos-default"
+class "GtkButton"           style "nemos-button"
+class "GtkEntry"            style "nemos-entry"
+class "GtkSpinButton"       style "nemos-entry"
+class "GtkMenuBar"          style "nemos-menubar"
+class "GtkMenuItem"         style "nemos-menuitem"
+class "GtkMenu"             style "nemos-default"
+class "GtkRange"            style "nemos-scale"
+class "GtkProgressBar"      style "nemos-progress"
+class "GtkScrollbar"        style "nemos-scrollbar"
+widget "GtkTooltips*"       style "nemos-tooltips"
+widget "GtkToolbar"         style "nemos-default"
+GTK2RC_EOF
+        echo "     -> gtk-2.0/ créé (fallback)"
+    fi
+
+    # --- OpenBox ---
+    echo "  -> Installation du thème OpenBox..."
+    if [ -d "${srcdir}/openbox-3" ]; then
+        cp -r "${srcdir}/openbox-3" "${themedir}/"
+        echo "     -> openbox-3/ installé"
+    else
+        # Créer un thème OpenBox minimal
+        mkdir -p "${themedir}/openbox-3"
+        cat > "${themedir}/openbox-3/themerc" << 'OBTHEME_EOF'
+# Thème OpenBox nemOS-Dark
+# Inspiré de macOS Mojave Dark
+
+# Fenêtres
+window.titlebar.bg: solid flat
+window.titlebar.bg.color: #1E1E2E
+window.titlebar.bg.border.color: #45475A
+window.titlebar.separator.color: #45475A
+
+window.label.text.color: #CDD6F4
+window.label.text.justify: center
+window.label.text.font: Noto Sans:pixelsize=12:bold
+
+# Boutons de la barre de titre
+window.button.close.bg: parentrelative
+window.button.close.unpressed.image.color: #F38BA8
+window.button.close.hover.image.color: #F38BA8
+window.button.close.pressed.image.color: #D32F6A
+
+window.button.maximize.bg: parentrelative
+window.button.maximize.unpressed.image.color: #A6E3A1
+window.button.maximize.hover.image.color: #A6E3A1
+window.button.maximize.pressed.image.color: #74C76A
+
+window.button.iconify.bg: parentrelative
+window.button.iconify.unpressed.image.color: #F9E2AF
+window.button.iconify.hover.image.color: #F9E2AF
+window.button.iconify.pressed.image.color: #D4C08A
+
+window.button.shade.bg: parentrelative
+window.button.shade.unpressed.image.color: #89B4FA
+window.button.shade.hover.image.color: #89B4FA
+
+window.button.desk.unpressed.image.color: #BAC2DE
+window.button.desk.hover.image.color: #BAC2DE
+
+# Bordures de la fenêtre
+window.client.padding.width: 0
+window.client.padding.height: 0
+window.handle.width: 3
+window.handle.bg: solid flat
+window.handle.bg.color: #11111B
+
+# Fenêtre active
+window.active.titlebar.bg: solid flat
+window.active.titlebar.bg.color: #1E1E2E
+window.active.label.text.color: #CDD6F4
+
+window.inactive.titlebar.bg: solid flat
+window.inactive.titlebar.bg.color: #181825
+window.inactive.label.text.color: #6C7086
+
+# Contenu de la fenêtre
+window.active.client.color: #11111B
+window.inactive.client.color: #11111B
+
+# Grip de redimensionnement
+window.active.grip.bg: solid flat
+window.active.grip.bg.color: #11111B
+window.inactive.grip.bg: solid flat
+window.inactive.grip.bg.color: #11111B
+
+# Menu
+menu.title.bg: solid flat
+menu.title.bg.color: #1A73E8
+menu.title.text.color: #FFFFFF
+menu.title.text.font: Noto Sans:pixelsize=12:bold
+menu.title.text.justify: center
+
+menu.items.bg: solid flat
+menu.items.bg.color: #1E1E2E
+menu.items.text.color: #CDD6F4
+menu.items.text.font: Noto Sans:pixelsize=11
+menu.items.active.bg: solid flat
+menu.items.active.bg.color: #1A73E8
+menu.items.active.text.color: #FFFFFF
+menu.items.disabled.text.color: #6C7086
+
+menu.separator.color: #45475A
+menu.separator.width: 1
+menu.separator.padding.width: 6
+menu.separator.padding.height: 4
+
+menu.border.width: 1
+menu.border.color: #45475A
+
+# OSD (dialogues)
+osd.border.width: 1
+osd.border.color: #45475A
+osd.bg: solid flat
+osd.bg.color: #1E1E2E
+osd.label.text.color: #CDD6F4
+osd.label.text.font: Noto Sans:pixelsize=11
+OBTHEME_EOF
+        echo "     -> openbox-3/ créé (fallback)"
+    fi
+
+    # --- Assets (images du thème) ---
+    echo "  -> Installation des assets du thème..."
+    if [ -d "${srcdir}/assets" ]; then
+        cp -r "${srcdir}/assets" "${themedir}/"
+        echo "     -> assets/ installé"
+    else
+        mkdir -p "${themedir}/assets"
+        echo "     -> assets/ créé (vide)"
+    fi
+
+    # --- Métadonnées du thème ---
+    echo "  -> Installation des métadonnées..."
+    install -Dm644 /dev/stdin "${themedir}/metadata.json" << 'META_EOF'
+{
+    "theme-name": "nemOS-Dark",
+    "theme-description": "Thème GTK dark pour nemOS - Inspiré de macOS Mojave Dark",
+    "theme-version": "1.0.0",
+    "theme-author": "nemOS Team",
+    "theme-url": "https://nemos.dev",
+    "gtk-version": ["3.22", "3.24", "2.0"],
+    "color-scheme": "dark",
+    "inherits": "Adwaita"
+}
+META_EOF
+
+    # Document d'installation
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/doc/${pkgname}/README" << 'README_EOF'
+nemOS-Theme - Thème GTK nemOS-Dark
+===================================
+
+Thème GTK sombre personnalisé pour la distribution nemOS.
+Inspiré de l'apparence de macOS Mojave Dark avec des couleurs
+adaptées à l'identité visuelle de nemOS.
+
+Palette de couleurs :
+  - Arrière-plan sombre    : #11111B
+  - Arrière-plan moyen     : #1E1E2E
+  - Arrière-plan clair     : #313244
+  - Texte principal        : #CDD6F4
+  - Texte secondaire       : #A6ADC8
+  - Accent bleu            : #1A73E8
+  - Bordure                : #45475A
+
+Composants inclus :
+  - GTK 3 thème (CSS)
+  - GTK 2 thème (gtkrc + moteur Murrine)
+  - OpenBox thème (themerc)
+  - Assets graphiques
+
+Application du thème :
+
+  GTK 3 (via gsettings) :
+    gsettings set org.gnome.desktop.interface gtk-theme 'nemOS-Dark'
+
+  GTK 2/3 (via fichier) :
+    echo 'gtk-theme-name="nemOS-Dark"' > ~/.gtkrc-2.0
+    echo '[Settings]\ngtk-theme-name=nemOS-Dark' > ~/.config/gtk-3.0/settings.ini
+
+  OpenBox :
+    obconf  # Sélectionner "nemOS-Dark" dans la liste
+
+  lxappearance :
+    Ouvrir lxappearance > Onglet "Thème" > Sélectionner "nemOS-Dark"
+README_EOF
+
+    # Permissions
+    find "${pkgdir}" -type d -exec chmod 755 {} \;
+    find "${pkgdir}" -type f -exec chmod 644 {} \;
+
+    echo "  -> Paquet ${pkgname}-${pkgver}-${pkgrel} prêt."
+}

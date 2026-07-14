@@ -1,0 +1,52 @@
+# ============================================================================
+# Configuration GRUB par défaut pour nemOS
+# Ce fichier est installé dans /etc/default/grub
+# Après modification, exécuter : sudo grub-mkconfig -o /boot/grub/grub.cfg
+# ============================================================================
+
+# Entrée par défaut (0 = première entrée, 'saved' = dernière sélectionnée)
+GRUB_DEFAULT=0
+
+# Temps d'attente avant le démarrage automatique (en secondes)
+# Mettre -1 pour désactiver le timeout (attente infinie)
+GRUB_TIMEOUT=5
+
+# Nom affiché dans le menu GRUB
+GRUB_DISTRIBUTOR="nemOS"
+
+# Paramètres du noyau passés par défaut
+# quiet : Réduit la verbosité du noyau au démarrage
+# splash : Affiche l'écran de démarrage graphique (plymouth)
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+
+# Paramètres supplémentaires du noyau (ajoutés dans tous les cas)
+GRUB_CMDLINE_LINUX=""
+
+# Terminal d'affichage
+# 'console' pour le terminal texte, 'gfxterm' pour le terminal graphique
+GRUB_TERMINAL=console
+
+# Résolution graphique pour le terminal GRUB
+# Format : LARGEURxHAUTEURxCOLORS
+# Utiliser 'auto' pour la meilleure résolution disponible
+GRUB_GFXMODE=1024x768x32
+
+# Thème GRUB personnalisé nemOS
+GRUB_THEME=/boot/grub/themes/nemOS/theme.txt
+
+# Sauvegarder l'entrée sélectionnée au prochain redémarrage
+#GRUB_SAVEDEFAULT=true
+
+# Désactiver le recovery mode (mode sans échec)
+# Décommenter pour cacher les entrées de récupération
+#GRUB_DISABLE_RECOVERY=true
+
+# Résolution pour les entrées Linux
+# Utilise la même résolution que GRUB_GFXMODE par défaut
+#GRUB_GFXPAYLOAD_LINUX=keep
+
+# Résolution du terminal Plymouth (écran de démarrage)
+#GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT splash"
+
+# Activer le son de démarrage (si supporté)
+#GRUB_INIT_TUNE="480 440 1"

@@ -1,0 +1,72 @@
+/* ══════════════════════════════════════════════════════════════
+   nemOS-Dark — Dark variant
+   Imports base theme and applies forced-dark overrides
+   for apps that use this file via gtk-application-prefer-dark-theme
+   ══════════════════════════════════════════════════════════════ */
+
+@import url("gtk.css");
+
+/* Force every widget to the dark palette — override any
+   inherited light values that apps might inject. */
+
+* {
+  color: @text;
+  background-color: @dark_bg;
+}
+
+/* Ensure entries stay dark */
+entry,
+spinbutton {
+  background-color: @darkest_bg;
+  color: @text;
+}
+
+/* Ensure text views stay dark */
+textview,
+textview text {
+  background-color: @darkest_bg;
+  color: @text;
+}
+
+/* Ensure views/lists stay dark */
+.view {
+  background-color: @darkest_bg;
+  color: @text;
+}
+
+/* Sidebars */
+.sidebar {
+  background-color: @darker_bg;
+}
+
+/* Tree views */
+treeview {
+  background-color: @darkest_bg;
+  color: @text;
+}
+
+/* Ensure popovers / menus stay dark */
+popover,
+menu,
+.menubar {
+  background-color: @surface;
+  color: @text;
+}
+
+/* Calendar */
+calendar {
+  background-color: @dark_bg;
+  color: @text;
+}
+
+/* Dialogs */
+dialog {
+  background-color: @dark_bg;
+  color: @text;
+}
+
+/* Tooltips stay dark */
+.tooltip {
+  background-color: @surface;
+  color: @text;
+}

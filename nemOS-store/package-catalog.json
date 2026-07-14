@@ -1,0 +1,328 @@
+{
+  "version": "1.0",
+  "description": "Catalogue d'applications nemOS Store",
+  "categories": [
+    {
+      "id": "tout",
+      "nom": "Tout",
+      "icone": "view-grid-symbolic"
+    },
+    {
+      "id": "internet",
+      "nom": "Internet",
+      "icone": "web-browser-symbolic"
+    },
+    {
+      "id": "bureautique",
+      "nom": "Bureautique",
+      "icone": "x-office-document-symbolic"
+    },
+    {
+      "id": "multimedia",
+      "nom": "Multimédia",
+      "icone": "multimedia-video-player-symbolic"
+    },
+    {
+      "id": "outils",
+      "nom": "Outils",
+      "icone": "utilities-terminal-symbolic"
+    },
+    {
+      "id": "developpement",
+      "nom": "Développement",
+      "icone": "code-symbolic"
+    },
+    {
+      "id": "systeme",
+      "nom": "Système",
+      "icone": "drive-harddisk-symbolic"
+    },
+    {
+      "id": "jeux",
+      "nom": "Jeux",
+      "icone": "applications-games-symbolic"
+    }
+  ],
+  "paquets": [
+    {
+      "nom": "firefox-esr",
+      "description": "Navigateur web Firefox ESR, sûr et rapide",
+      "categorie": "internet",
+      "icone": "firefox-esr",
+      "mis_en_avant": true
+    },
+    {
+      "nom": "thunderbird",
+      "description": "Client de courriel Mozilla Thunderbird",
+      "categorie": "internet",
+      "icone": "thunderbird",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "transmission-gtk",
+      "description": "Client BitTorrent léger et simple",
+      "categorie": "internet",
+      "icone": "transmission-gtk",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "hexchat",
+      "description": "Client IRC graphique populaire",
+      "categorie": "internet",
+      "icone": "hexchat",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "libreoffice-fresh",
+      "description": "Suite bureautique complète et libre",
+      "categorie": "bureautique",
+      "icone": "libreoffice-fresh",
+      "mis_en_avant": true
+    },
+    {
+      "nom": "evince",
+      "description": "Visionneuse de documents PDF et plus",
+      "categorie": "bureautique",
+      "icone": "evince",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "xournalpp",
+      "description": "Prise de notes manuscrites et annotation PDF",
+      "categorie": "bureautique",
+      "icone": "xournalpp",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "scribus",
+      "description": "Mise en page professionnelle et PAO",
+      "categorie": "bureautique",
+      "icone": "scribus",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "abiword",
+      "description": "Traitement de texte léger et rapide",
+      "categorie": "bureautique",
+      "icone": "abiword",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "vlc",
+      "description": "Lecteur multimédia universel",
+      "categorie": "multimedia",
+      "icone": "vlc",
+      "mis_en_avant": true
+    },
+    {
+      "nom": "audacity",
+      "description": "Éditeur audio multipiste professionnel",
+      "categorie": "multimedia",
+      "icone": "audacity",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "mpv",
+      "description": "Lecteur vidéo léger et de haute qualité",
+      "categorie": "multimedia",
+      "icone": "mpv",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "gnome-music",
+      "description": "Lecteur de musique pour GNOME",
+      "categorie": "multimedia",
+      "icone": "gnome-music",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "shotwell",
+      "description": "Gestionnaire de photos simple et efficace",
+      "categorie": "multimedia",
+      "icone": "shotwell",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "gimp",
+      "description": "Éditeur d'images professionnel et puissant",
+      "categorie": "multimedia",
+      "icone": "gimp",
+      "mis_en_avant": true
+    },
+    {
+      "nom": "inkscape",
+      "description": "Éditeur de graphismes vectoriels SVG",
+      "categorie": "multimedia",
+      "icone": "inkscape",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "geany",
+      "description": "Éditeur de texte léger avec IDE intégré",
+      "categorie": "outils",
+      "icone": "geany",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "htop",
+      "description": "Moniteur système interactif en terminal",
+      "categorie": "outils",
+      "icone": "htop",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "neofetch",
+      "description": "Affiche les informations système dans le terminal",
+      "categorie": "outils",
+      "icone": "neofetch",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "terminator",
+      "description": "Émulateur de terminal avec plusieurs onglets",
+      "categorie": "outils",
+      "icone": "terminator",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "filezilla",
+      "description": "Client FTP/SFTP complet et fiable",
+      "categorie": "outils",
+      "icone": "filezilla",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "gnome-screenshot",
+      "description": "Outil de capture d'écran pour GNOME",
+      "categorie": "outils",
+      "icone": "gnome-screenshot",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "catfish",
+      "description": "Recherche de fichiers rapide et puissante",
+      "categorie": "outils",
+      "icone": "catfish",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "git",
+      "description": "Système de contrôle de version distribué",
+      "categorie": "developpement",
+      "icone": "git",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "code",
+      "description": "Éditeur de code Visual Studio Codium",
+      "categorie": "developpement",
+      "icone": "visual-studio-code",
+      "mis_en_avant": true
+    },
+    {
+      "nom": "nodejs",
+      "description": "Environnement d'exécution JavaScript côté serveur",
+      "categorie": "developpement",
+      "icone": "nodejs",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "python",
+      "description": "Langage de programmation Python 3",
+      "categorie": "developpement",
+      "icone": "python",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "gcc",
+      "description": "Compilateur C/C++ GNU",
+      "categorie": "developpement",
+      "icone": "gcc",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "make",
+      "description": "Outil de construction automatisée",
+      "categorie": "developpement",
+      "icone": "make",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "gparted",
+      "description": "Éditeur de partitions graphique",
+      "categorie": "systeme",
+      "icone": "gparted",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "timeshift",
+      "description": "Sauvegarde et restauration du système",
+      "categorie": "systeme",
+      "icone": "timeshift",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "gnome-disk-utility",
+      "description": "Gestionnaire de disques et partitions",
+      "categorie": "systeme",
+      "icone": "gnome-disk-utility",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "baobab",
+      "description": "Analyseur d'utilisation du disque",
+      "categorie": "systeme",
+      "icone": "baobab",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "gdebi",
+      "description": "Installation simple de paquets .deb",
+      "categorie": "systeme",
+      "icone": "gdebi",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "bleachbit",
+      "description": "Nettoyeur de système et protecteur de vie privée",
+      "categorie": "systeme",
+      "icone": "bleachbit",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "supertuxkart",
+      "description": "Jeu de course de kart en 3D",
+      "categorie": "jeux",
+      "icone": "supertuxkart",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "0ad",
+      "description": "Jeu de stratégie en temps réel historique",
+      "categorie": "jeux",
+      "icone": "0ad",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "minetest",
+      "description": "Jeu de construction de mondes en blocs",
+      "categorie": "jeux",
+      "icone": "minetest",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "steam",
+      "description": "Plateforme de jeux Steam (optionnel - i686 limité)",
+      "categorie": "jeux",
+      "icone": "steam",
+      "mis_en_avant": false
+    },
+    {
+      "nom": "chessx",
+      "description": "Jeu d'échecs avec base de données",
+      "categorie": "jeux",
+      "icone": "chessx",
+      "mis_en_avant": false
+    }
+  ]
+}

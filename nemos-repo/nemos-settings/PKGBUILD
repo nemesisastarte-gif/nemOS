@@ -1,0 +1,672 @@
+# Mainteneur : nemOS <contact@nemos.dev>
+# Paquet : nemos-settings
+# Panneau de configuration système pour nemOS
+
+pkgname=nemos-settings
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Paramètres système nemOS - Configuration et outils système"
+arch=('any')
+url="https://nemos.dev"
+license=('GPL-3.0-or-later')
+depends=(
+    'python'
+    'python-gobject'
+    'gtk3'
+)
+optdepends=(
+    'nemos-theme: pour la sélection du thème nemOS'
+    'nemos-wallpapers: pour la sélection des fonds d\'écran'
+    'nemos-icons: pour la sélection du thème d\'icônes'
+    'lightdm: pour la configuration du gestionnaire d\'affichage'
+    'networkmanager: pour la configuration réseau'
+    'blueman: pour la configuration Bluetooth'
+    'pavucontrol: pour la configuration audio'
+)
+makedepends=()
+provides=('nemos-control-center')
+conflicts=('nemos-control-center')
+replaces=('nemos-control-center')
+options=('!strip' '!debug')
+install=${pkgname}.install
+
+# Sources locales
+source=(
+    "nemos-settings.py"
+    "nemos-settings.desktop"
+)
+sha256sums=('SKIP' 'SKIP')
+
+package() {
+    # Répertoire de l'application
+    local appdir="${pkgdir}/usr/lib/nemos-settings"
+    mkdir -p "${appdir}"
+
+    # --- Application principale ---
+    echo "  -> Installation de nemos-settings..."
+
+    if [ -f "${srcdir}/nemos-settings.py" ]; then
+        install -Dm755 "${srcdir}/nemos-settings.py" "${appdir}/nemos-settings.py"
+        echo "     -> nemos-settings.py"
+    else
+        # Créer le panneau de configuration complet
+        install -Dm755 /dev/stdin "${appdir}/nemos-settings.py" << 'SETTINGS_EOF'
+#!/usr/bin/env python3
+# nemOS Settings - Panneau de configuration système nemOS
+# Interface GTK3 pour la gestion des paramètres système
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GObject, GLib, Gdk, Pango, Gio
+import os
+import sys
+import subprocess
+import json
+import configparser
+import getpass
+import shutil
+
+# Constantes
+VERSION = "1.0.0"
+SETTINGS_DIR = os.path.expanduser("~/.config/nemos-settings")
+SETTINGS_FILE = os.path.join(SETTINGS_DIR, "settings.json")
+THEMES_DIR = "/usr/share/themes"
+ICONS_DIR = "/usr/share/icons"
+WALLPAPERS_DIR = "/usr/share/backgrounds/nemOS"
+OPENBOX_RC = os.path.expanduser("~/.config/openbox/rc.xml")
+GTK3_SETTINGS = os.path.expanduser("~/.config/gtk-3.0/settings.ini")
+GTK2_RC = os.path.expanduser("~/.gtkrc-2.0")
+
+# Palette de couleurs nemOS
+COLORS = {
+    "bg_dark": "#11111B",
+    "bg_mid": "#1E1E2E",
+    "bg_light": "#313244",
+    "text": "#CDD6F4",
+    "text_dim": "#A6ADC8",
+    "accent": "#1A73E8",
+    "border": "#45475A",
+    "error": "#F38BA8",
+    "success": "#A6E3A1",
+    "warning": "#F9E2AF",
+}
+
+# CSS personnalisé pour le panneau
+CUSTOM_CSS = f"""
+/* nemOS Settings - Feuille de style */
+
+.settings-window {{
+    background-color: {COLORS['bg_dark']};
+}}
+
+.sidebar-button {{
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: {COLORS['text']};
+    font-size: 13px;
+}}
+
+.sidebar-button:hover {{
+    background-color: {COLORS['bg_light']};
+}}
+
+.sidebar-button:active {{
+    background-color: {COLORS['accent']};
+    color: white;
+}}
+
+.settings-card {{
+    background-color: {COLORS['bg_mid']};
+    border-radius: 12px;
+    border: 1px solid {COLORS['border']};
+    padding: 20px;
+}}
+
+.settings-label {{
+    color: {COLORS['text']};
+    font-size: 13px;
+}}
+
+.settings-desc {{
+    color: {COLORS['text_dim']};
+    font-size: 11px;
+}}
+
+.settings-title {{
+    color: {COLORS['text']};
+    font-size: 18px;
+    font-weight: bold;
+}}
+"""
+
+
+class SettingsPage(Gtk.Box):
+    """Classe de base pour une page de paramètres"""
+
+    def __init__(self, title, icon_name):
+        super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self.title = title
+        self.icon_name = icon_name
+        self.set_margin_start(24)
+        self.set_margin_end(24)
+        self.set_margin_top(16)
+        self.set_margin_bottom(16)
+
+    def create_card(self, title, description=None):
+        """Créer une carte de paramètres"""
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        card.get_style_context().add_class("settings-card")
+
+        label = Gtk.Label()
+        label.set_markup(f'<b>{title}</b>')
+        label.set_xalign(0)
+        label.get_style_context().add_class("settings-label")
+        card.pack_start(label, False, False, 0)
+
+        if description:
+            desc = Gtk.Label(description)
+            desc.set_xalign(0)
+            desc.get_style_context().add_class("settings-desc")
+            desc.set_line_wrap(True)
+            desc.set_max_width_chars(60)
+            card.pack_start(desc, False, False, 0)
+
+        return card
+
+
+class AppearancePage(SettingsPage):
+    """Page Apparence - Thèmes, icônes, polices"""
+
+    def __init__(self):
+        super().__init__("Apparence", "preferences-desktop-theme")
+        self._build()
+
+    def _build(self):
+        # Titre
+        title = Gtk.Label("Apparence")
+        title.get_style_context().add_class("settings-title")
+        title.set_xalign(0)
+        self.pack_start(title, False, False, 0)
+
+        # Sélection du thème GTK
+        theme_card = self.create_card(
+            "Thème GTK",
+            "Choisissez le thème d'apparence des fenêtres et des contrôles"
+        )
+        theme_combo = Gtk.ComboBoxText()
+        self._populate_themes(theme_combo)
+        theme_combo.set_valign(Gtk.Align.CENTER)
+        theme_combo.connect("changed", self._on_theme_changed)
+        theme_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        theme_box.pack_start(Gtk.Label("Thème :"), False, False, 0)
+        theme_box.pack_start(theme_combo, False, False, 0)
+        theme_card.pack_start(theme_box, False, False, 8)
+        self.pack_start(theme_card, False, False, 0)
+
+        # Sélection du thème d'icônes
+        icon_card = self.create_card(
+            "Thème d'icônes",
+            "Choisissez le jeu d'icônes pour le bureau"
+        )
+        icon_combo = Gtk.ComboBoxText()
+        self._populate_icons(icon_combo)
+        icon_combo.set_valign(Gtk.Align.CENTER)
+        icon_combo.connect("changed", self._on_icon_changed)
+        icon_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        icon_box.pack_start(Gtk.Label("Icônes :"), False, False, 0)
+        icon_box.pack_start(icon_combo, False, False, 0)
+        icon_card.pack_start(icon_box, False, False, 8)
+        self.pack_start(icon_card, False, False, 0)
+
+        # Sélection du fond d'écran
+        wp_card = self.create_card(
+            "Fond d'écran",
+            "Choisissez le fond d'écran du bureau"
+        )
+        wp_combo = Gtk.ComboBoxText()
+        self._populate_wallpapers(wp_combo)
+        wp_combo.set_valign(Gtk.Align.CENTER)
+        wp_combo.connect("changed", self._on_wallpaper_changed)
+        wp_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        wp_box.pack_start(Gtk.Label("Fond d'écran :"), False, False, 0)
+        wp_box.pack_start(wp_combo, False, False, 0)
+        wp_card.pack_start(wp_box, False, False, 8)
+        self.pack_start(wp_card, False, False, 0)
+
+        # Police
+        font_card = self.create_card(
+            "Polices",
+            "Configurez les polices du système"
+        )
+        font_btn = Gtk.FontButton()
+        font_btn.set_valign(Gtk.Align.CENTER)
+        font_btn.set_use_font(True)
+        font_btn.set_use_size(True)
+        font_btn.connect("font-set", self._on_font_changed)
+        font_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        font_box.pack_start(Gtk.Label("Police :"), False, False, 0)
+        font_box.pack_start(font_btn, False, False, 0)
+        font_card.pack_start(font_box, False, False, 8)
+        self.pack_start(font_card, False, False, 0)
+
+    def _populate_themes(self, combo):
+        """Remplir la liste des thèmes GTK disponibles"""
+        if os.path.isdir(THEMES_DIR):
+            for theme in sorted(os.listdir(THEMES_DIR)):
+                theme_path = os.path.join(THEMES_DIR, theme)
+                if os.path.isdir(theme_path):
+                    combo.append(theme, theme)
+        # Sélectionner le thème actuel
+        try:
+            with open(GTK3_SETTINGS, 'r') as f:
+                for line in f:
+                    if 'gtk-theme-name' in line:
+                        current = line.split('=')[1].strip().strip("'\"")
+                        idx = 0
+                        for i in range(combo.get_model().iter_n_children(None)):
+                            if combo.get_model().get_value(
+                                combo.get_model().iter_nth_child(None, i), 0) == current:
+                                idx = i
+                                break
+                        combo.set_active(idx)
+                        break
+        except (FileNotFoundError, IndexError):
+            combo.set_active(0)
+
+    def _populate_icons(self, combo):
+        """Remplir la liste des thèmes d'icônes disponibles"""
+        if os.path.isdir(ICONS_DIR):
+            for icon_theme in sorted(os.listdir(ICONS_DIR)):
+                icon_path = os.path.join(ICONS_DIR, icon_theme)
+                if os.path.isdir(icon_path) and os.path.isfile(
+                        os.path.join(icon_path, "index.theme")):
+                    combo.append(icon_theme, icon_theme)
+        combo.set_active(0)
+
+    def _populate_wallpapers(self, combo):
+        """Remplir la liste des fonds d'écran disponibles"""
+        if os.path.isdir(WALLPAPERS_DIR):
+            for wp in sorted(os.listdir(WALLPAPERS_DIR)):
+                if wp.endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                    combo.append(wp, wp)
+        combo.set_active(0)
+
+    def _on_theme_changed(self, combo):
+        """Appliquer le thème GTK sélectionné"""
+        theme = combo.get_active_text()
+        if not theme:
+            return
+        # GTK 3
+        os.makedirs(os.path.dirname(GTK3_SETTINGS), exist_ok=True)
+        config = configparser.ConfigParser()
+        config['Settings'] = {'gtk-theme-name': theme}
+        with open(GTK3_SETTINGS, 'w') as f:
+            config.write(f)
+        # GTK 2
+        with open(GTK2_RC, 'w') as f:
+            f.write(f'gtk-theme-name="{theme}"\n')
+            f.write(f'gtk-icon-theme-name="nemOS-Icons"\n')
+
+    def _on_icon_changed(self, combo):
+        """Appliquer le thème d'icônes sélectionné"""
+        icons = combo.get_active_text()
+        if not icons:
+            return
+        # GTK 3
+        try:
+            config = configparser.ConfigParser()
+            config.read(GTK3_SETTINGS)
+            if 'Settings' not in config:
+                config['Settings'] = {}
+            config['Settings']['gtk-icon-theme-name'] = icons
+            with open(GTK3_SETTINGS, 'w') as f:
+                config.write(f)
+        except Exception:
+            pass
+
+    def _on_wallpaper_changed(self, combo):
+        """Appliquer le fond d'écran sélectionné"""
+        wp = combo.get_active_text()
+        if not wp:
+            return
+        wp_path = os.path.join(WALLPAPERS_DIR, wp)
+        if os.path.isfile(wp_path):
+            subprocess.run(
+                ["feh", "--bg-scale", wp_path],
+                capture_output=True, timeout=5
+            )
+
+    def _on_font_changed(self, btn):
+        """Appliquer la police sélectionnée"""
+        font = btn.get_font_name()
+        try:
+            config = configparser.ConfigParser()
+            config.read(GTK3_SETTINGS)
+            if 'Settings' not in config:
+                config['Settings'] = {}
+            config['Settings']['gtk-font-name'] = font
+            with open(GTK3_SETTINGS, 'w') as f:
+                config.write(f)
+        except Exception:
+            pass
+
+
+class DisplayPage(SettingsPage):
+    """Page Affichage - Résolution, moniteurs"""
+
+    def __init__(self):
+        super().__init__("Affichage", "preferences-desktop-display")
+        self._build()
+
+    def _build(self):
+        title = Gtk.Label("Affichage")
+        title.get_style_context().add_class("settings-title")
+        title.set_xalign(0)
+        self.pack_start(title, False, False, 0)
+
+        # Informations sur le display
+        info_card = self.create_card("Informations sur l'affichage",
+                                     "Détails des écrans connectés")
+        try:
+            output = subprocess.check_output(["xrandr"], text=True, timeout=5)
+            info_label = Gtk.Label(output)
+            info_label.set_xalign(0)
+            info_label.set_selectable(True)
+            info_label.set_font("Monospace 10")
+            info_label.set_margin_top(8)
+            info_card.pack_start(info_label, False, False, 0)
+        except Exception as e:
+            info_label = Gtk.Label(f"Impossible de détecter les écrans : {e}")
+            info_label.set_xalign(0)
+            info_card.pack_start(info_label, False, False, 0)
+
+        self.pack_start(info_card, False, False, 0)
+
+
+class NetworkPage(SettingsPage):
+    """Page Réseau - Gestion du réseau"""
+
+    def __init__(self):
+        super().__init__("Réseau", "preferences-system-network")
+        self._build()
+
+    def _build(self):
+        title = Gtk.Label("Réseau")
+        title.get_style_context().add_class("settings-title")
+        title.set_xalign(0)
+        self.pack_start(title, False, False, 0)
+
+        nm_card = self.create_card(
+            "Gestionnaire de réseau",
+            "Ouvrir le gestionnaire de réseau NetworkManager"
+        )
+        nm_btn = Gtk.Button(label="Ouvrir nm-connection-editor")
+        nm_btn.connect("clicked", lambda b: subprocess.Popen(
+            ["nm-connection-editor"], start_new_session=True))
+        nm_btn.set_valign(Gtk.Align.CENTER)
+        nm_card.pack_start(nm_btn, False, False, 8)
+        self.pack_start(nm_card, False, False, 0)
+
+
+class SystemPage(SettingsPage):
+    """Page Système - Informations et outils système"""
+
+    def __init__(self):
+        super().__init__("Système", "applications-system")
+        self._build()
+
+    def _build(self):
+        title = Gtk.Label("Système")
+        title.get_style_context().add_class("settings-title")
+        title.set_xalign(0)
+        self.pack_start(title, False, False, 0)
+
+        # Informations système
+        info_card = self.create_card(
+            "Informations système",
+            "Détails sur le matériel et le logiciel"
+        )
+
+        # Version de nemOS
+        try:
+            with open("/etc/os-release") as f:
+                for line in f:
+                    if line.startswith("PRETTY_NAME="):
+                        ver = line.split("=")[1].strip().strip('"')
+                        break
+                else:
+                    ver = "nemOS"
+        except Exception:
+            ver = "nemOS"
+
+        info_text = f"Distribution : {ver}\n"
+        info_text += f"Version des paramètres : {VERSION}\n"
+        info_text += f"Noyau : {os.uname().release}\n"
+        info_text += f"Architecture : {os.uname().machine}\n"
+        info_text += f"Utilisateur : {getpass.getuser()}\n"
+
+        info_label = Gtk.Label(info_text)
+        info_label.set_xalign(0)
+        info_label.set_selectable(True)
+        info_label.set_margin_top(8)
+        info_card.pack_start(info_label, False, False, 0)
+        self.pack_start(info_card, False, False, 0)
+
+        # Outils système
+        tools_card = self.create_card(
+            "Outils système",
+            "Utilitaires de gestion du système"
+        )
+
+        tools = [
+            ("Gestionnaire de paquets (pamac)", ["pamac-manager"]),
+            ("Moniteur système (htop)", ["x-terminal-emulator", "-e", "htop"]),
+            ("Éditeur de partitions (GParted)", ["gparted"]),
+            ("Nettoyer le cache pacman",
+             ["x-terminal-emulator", "-e", "sudo", "pacman", "-Sc"]),
+        ]
+
+        for name, cmd in tools:
+            btn = Gtk.Button(label=name)
+            btn.connect("clicked", lambda b, c=cmd: subprocess.Popen(
+                c, start_new_session=True, stderr=subprocess.DEVNULL))
+            btn.set_valign(Gtk.Align.CENTER)
+            tools_card.pack_start(btn, False, False, 4)
+
+        self.pack_start(tools_card, False, False, 0)
+
+        # À propos
+        about_card = self.create_card(
+            "À propos de nemOS",
+            "Informations sur la distribution"
+        )
+        about_label = Gtk.Label(
+            "nemOS - Distribution Linux légère\n"
+            "Inspirée de macOS\n"
+            "Basée sur Arch Linux\n"
+            "Interface OpenBox + Tint2 + Plank\n\n"
+            "https://nemos.dev"
+        )
+        about_label.set_xalign(0)
+        about_label.set_margin_top(8)
+        about_card.pack_start(about_label, False, False, 0)
+        self.pack_start(about_card, False, False, 0)
+
+
+class NemOSSettingsApp(Gtk.Application):
+    """Application nemOS Settings"""
+
+    def __init__(self):
+        super().__init__(
+            application_id='dev.nemos.Settings',
+            flags=Gio.ApplicationFlags.FLAGS_NONE
+        )
+
+    def do_activate(self):
+        win = NemOSSettingsWindow(self)
+        win.set_application(self)
+        win.show_all()
+
+
+class NemOSSettingsWindow(Gtk.ApplicationWindow):
+    """Fenêtre principale des paramètres"""
+
+    def __init__(self, app):
+        super().__init__(application=app)
+        self.set_title("Paramètres système nemOS")
+        self.set_default_size(850, 600)
+        self.set_position(Gtk.WindowPosition.CENTER)
+        self.set_icon_name("preferences-system")
+
+        # Appliquer le CSS personnalisé
+        provider = Gtk.CssProvider()
+        provider.load_from_data(CUSTOM_CSS.encode('utf-8'))
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(), provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
+        self._build_ui()
+
+    def _build_ui(self):
+        """Construire l'interface"""
+        # Barre d'en-tête
+        header = Gtk.HeaderBar()
+        header.set_show_close_button(True)
+        header.set_title("Paramètres système")
+        header.set_subtitle("nemOS v" + VERSION)
+        self.set_titlebar(header)
+
+        # Conteneur principal
+        main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.add(main_box)
+
+        # Séparateur gauche (sidebar)
+        sep_left = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        main_box.pack_start(sep_left, False, False, 0)
+
+        # Panneau latéral
+        sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        sidebar.set_size_request(200, -1)
+        sidebar.set_margin_top(8)
+        sidebar.set_margin_bottom(8)
+        sidebar.set_margin_start(8)
+        sidebar.set_margin_end(8)
+        main_box.pack_start(sidebar, False, False, 0)
+
+        # Pages de paramètres
+        pages = [
+            AppearancePage(),
+            DisplayPage(),
+            NetworkPage(),
+            SystemPage(),
+        ]
+
+        # Empiler les pages
+        stack = Gtk.Stack()
+        stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
+        stack.set_hexpand(True)
+        stack.set_vexpand(True)
+
+        for page in pages:
+            stack.add_titled(page, page.title.lower(), page.title)
+
+        main_box.pack_start(stack, True, True, 0)
+
+        # Boutons de navigation dans la sidebar
+        for page in pages:
+            btn = Gtk.Button(label=page.title)
+            btn.get_style_context().add_class("sidebar-button")
+            btn.set_xalign(0)
+            icon = Gtk.Image.new_from_icon_name(
+                page.icon_name, Gtk.IconSize.MENU)
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+            box.pack_start(icon, False, False, 0)
+            label = Gtk.Label(page.title)
+            label.set_xalign(0)
+            box.pack_start(label, True, True, 0)
+            btn.add(box)
+            btn.connect("clicked", lambda b, p=page: stack.set_visible_child(p))
+            sidebar.pack_start(btn, False, False, 0)
+
+        # Bouton de fermeture en bas
+        close_btn = Gtk.Button(label="Fermer")
+        close_btn.get_style_context().add_class("sidebar-button")
+        close_btn.connect("clicked", lambda b: self.destroy())
+        sidebar.pack_end(close_btn, False, False, 0)
+
+
+def main():
+    app = NemOSSettingsApp()
+    return app.run(sys.argv)
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+SETTINGS_EOF
+        echo "     -> nemos-settings.py (généré)"
+    fi
+
+    # --- Fichier desktop ---
+    echo "  -> Installation du fichier .desktop..."
+    if [ -f "${srcdir}/nemos-settings.desktop" ]; then
+        install -Dm644 "${srcdir}/nemos-settings.desktop" \
+            "${pkgdir}/usr/share/applications/nemos-settings.desktop"
+    else
+        install -Dm644 /dev/stdin "${pkgdir}/usr/share/applications/nemos-settings.desktop" << 'DESKTOP_EOF'
+[Desktop Entry]
+Name=Paramètres système nemOS
+Comment=Configuration et outils système pour nemOS
+Comment[fr]=Configuration et outils système pour nemOS
+Exec=/usr/lib/nemos-settings/nemos-settings.py
+Icon=preferences-system
+Type=Application
+Categories=Settings;System;DesktopSettings;
+Keywords=settings;preferences;config;paramètres;configuration;
+StartupNotify=true
+StartupWMClass=nemos-settings
+Terminal=false
+DESKTOP_EOF
+    fi
+
+    # --- Lien symbolique pour l'exécutable ---
+    echo "  -> Création du lien d'exécution..."
+    mkdir -p "${pkgdir}/usr/bin"
+    ln -sf "/usr/lib/nemos-settings/nemos-settings.py" \
+           "${pkgdir}/usr/bin/nemos-settings"
+
+    # Permissions
+    find "${pkgdir}" -type d -exec chmod 755 {} \;
+    find "${pkgdir}" -type f -exec chmod 644 {} \;
+    chmod 755 "${appdir}/nemos-settings.py" 2>/dev/null || true
+
+    # Document
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/doc/${pkgname}/README" << 'README_EOF'
+nemOS-Settings - Paramètres système nemOS
+==========================================
+
+Panneau de configuration système pour la distribution nemOS.
+Interface graphique GTK3 pour gérer les paramètres.
+
+Pages de configuration :
+  - Apparence : Thèmes GTK, icônes, polices, fond d'écran
+  - Affichage : Résolution, configuration des moniteurs
+  - Réseau : Gestionnaire NetworkManager
+  - Système : Informations, outils système, à propos
+
+Démarrage :
+  - Menu : Applications > Paramètres > Paramètres système
+  - Terminal : nemos-settings
+  - Raccourci : Alt+F2 > nemos-settings
+
+Configuration :
+  Les paramètres utilisateur sont stockés dans :
+  ~/.config/nemos-settings/settings.json
+  ~/.config/gtk-3.0/settings.ini
+  ~/.gtkrc-2.0
+README_EOF
+
+    echo "  -> Paquet ${pkgname}-${pkgver}-${pkgrel} prêt."
+}

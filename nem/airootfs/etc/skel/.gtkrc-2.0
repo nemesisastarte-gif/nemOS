@@ -1,0 +1,132 @@
+# nemOS GTK2 configuration
+# Lightweight, macOS-inspired dark theme
+
+gtk-theme-name = "nemOS-Dark"
+gtk-icon-theme-name = "Adwaita"
+gtk-font-name = "Noto Sans 10"
+gtk-cursor-theme-name = "Adwaita"
+gtk-cursor-theme-size = 24
+
+gtk-toolbar-style = 1
+gtk-toolbar-icon-size = GTK_ICON_SIZE_SMALL_TOOLBAR
+gtk-button-images = 1
+gtk-menu-images = 1
+
+gtk-enable-event-sounds = 0
+gtk-enable-input-feedback-sounds = 0
+
+gtk-xft-antialias = 1
+gtk-xft-hinting = 1
+gtk-xft-hintstyle = "hintslight"
+gtk-xft-rgba = "rgb"
+
+# macOS-style button ordering: close, minimize, maximize on left
+gtk-alternative-button-order = 1
+
+gtk-color-scheme = "bg_color:#1E1E2E\nfg_color:#CDD6F4\nbase_color:#11111B\ntext_color:#CDD6F4\nselected_bg_color:#1A73E8\nselected_fg_color:#FFFFFF\ntooltip_bg_color:#313244\ntooltip_fg_color:#CDD6F4\nlink_color:#1A73E8"
+
+style "default" {
+  font_name = "Noto Sans 10"
+
+  bg[NORMAL]      = "#1E1E2E"
+  bg[PRELIGHT]    = "#313244"
+  bg[ACTIVE]      = "#181825"
+  bg[SELECTED]    = "#1A73E8"
+  bg[INSENSITIVE] = "#181825"
+
+  fg[NORMAL]      = "#CDD6F4"
+  fg[PRELIGHT]    = "#CDD6F4"
+  fg[ACTIVE]      = "#CDD6F4"
+  fg[SELECTED]    = "#FFFFFF"
+  fg[INSENSITIVE] = "#585B70"
+
+  text[NORMAL]      = "#CDD6F4"
+  text[PRELIGHT]    = "#CDD6F4"
+  text[ACTIVE]      = "#CDD6F4"
+  text[SELECTED]    = "#FFFFFF"
+  text[INSENSITIVE] = "#585B70"
+
+  base[NORMAL]      = "#11111B"
+  base[PRELIGHT]    = "#1E1E2E"
+  base[ACTIVE]      = "#181825"
+  base[SELECTED]    = "#1A73E8"
+  base[INSENSITIVE] = "#181825"
+
+  xthickness = 1
+  ythickness = 1
+
+  GtkButton::inner-border = {6, 6, 3, 3}
+  GtkButton::default-border = {0, 0, 0, 0}
+  GtkButton::child-displacement-x = 0
+  GtkButton::child-displacement-y = 0
+
+  GtkWidget::focus-padding = 0
+  GtkWidget::focus-line-width = 1
+
+  GtkToolbar::shadow-type = GTK_SHADOW_NONE
+  GtkMenuBar::shadow-type = GTK_SHADOW_NONE
+  GtkMenu::shadow-type = GTK_SHADOW_NONE
+
+  GtkScrollbar::trough-border = 0
+  GtkRange::trough-border = 0
+
+  GtkTreeView::odd-row-color = "#222236"
+}
+
+style "button" = "default" {
+  bg[NORMAL]      = "#313244"
+  bg[PRELIGHT]    = "#45475A"
+  bg[ACTIVE]      = "#1A73E8"
+  bg[SELECTED]    = "#1A73E8"
+  fg[NORMAL]      = "#CDD6F4"
+  fg[PRELIGHT]    = "#FFFFFF"
+  fg[ACTIVE]      = "#FFFFFF"
+
+  engine "pixmap" {
+  }
+}
+
+style "entry" = "default" {
+  bg[NORMAL]   = "#11111B"
+  bg[PRELIGHT] = "#11111B"
+  base[NORMAL] = "#11111B"
+  text[NORMAL] = "#CDD6F4"
+}
+
+style "scrollbar" = "default" {
+  bg[NORMAL]   = "#181825"
+  trough-color = "#181825"
+}
+
+style "menubar" = "default" {
+  bg[NORMAL] = "#11111B"
+  fg[NORMAL] = "#CDD6F4"
+}
+
+style "menuitem" = "default" {
+  bg[PRELIGHT]  = "#1A73E8"
+  fg[PRELIGHT]  = "#FFFFFF"
+  bg[SELECTED]  = "#1A73E8"
+  fg[SELECTED]  = "#FFFFFF"
+  xthickness = 8
+  ythickness = 3
+}
+
+style "tooltip" = "default" {
+  bg[NORMAL] = "#313244"
+  fg[NORMAL] = "#CDD6F4"
+}
+
+style "sidebar" = "default" {
+  bg[NORMAL] = "#181825"
+  fg[NORMAL] = "#CDD6F4"
+}
+
+class "GtkWidget"        style "default"
+class "GtkButton"        style "button"
+class "GtkEntry"         style "entry"
+class "GtkScrollbar"     style "scrollbar"
+class "GtkMenuBar"       style "menubar"
+widget_class "*<GtkMenuItem>*" style "menuitem"
+widget_class "*.tooltip*" style "tooltip"
+widget_class "*Sidebar*" style "sidebar"

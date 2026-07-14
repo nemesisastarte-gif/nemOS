@@ -1,0 +1,95 @@
+#!/bin/bash
+# cleanup-packages.sh - Nettoyage des paquets pour nemOS
+# Ce script supprime les paquets inutiles de la liste pour réduire la taille de l'ISO
+
+set -e
+
+echo "=== Nettoyage de la liste des paquets nemOS ==="
+
+# Paquets à retirer (trop lourds pour un système 32-bit léger)
+REMOVE_PACKAGES=(
+    # Remplacés par des alternatives plus légères
+    "plasma-desktop"
+    "plasma-workspace"
+    "plasma-integration"
+    "plasma-nm"
+    "plasma-pa"
+    "plasma-thunderbolt"
+    "plasma-login-manager"
+    "bluedevil"
+    "breeze-gtk"
+    "kde-gtk-config"
+    "kinfocenter"
+    "konsole"
+    "kscreen"
+    "kate"
+    "dolphin"
+    "partitionmanager"
+    "kmail"
+    "gnome-maps"
+    "elisa"
+    "spectacle"
+    "gwenview"
+    "system-overview"
+    "system-settings"
+    "appmenu-gtk-module"
+    "nautilus"
+    "npm"
+    # Paquets de virtualisation et serveur (non nécessaires en live)
+    "cloud-init"
+    "open-iscsi"
+    "nfs-utils"
+    "openvpn"
+    "clonezilla"
+    "memtest86+"
+    "memtest86+-efi"
+    "qemu-guest-agent"
+    "virtualbox-guest-utils"
+    "spice-vdagent"
+    "hyperv"
+    "open-vm-tools"
+    "dnsmasq"
+    "darkhttpd"
+    "tcpdump"
+    "bind"
+    "bridge-utils"
+    "nbd"
+    # Pilotes spécifiques inutiles en 32-bit
+    "nvidia-utils"
+    "amd-ucode"
+    "intel-ucode"
+    "zfs-utils"
+    "bcachefs-tools"
+    "linux-cachyos-lts"
+    "linux-cachyos-lts-zfs"
+    "linux-cachyos-lts-nvidia-open"
+    # Applications pearOS spécifiques (remplacées par nemOS)
+    "pearos-notes"
+    "pearos-appstore"
+    "pearos-calendar"
+    "pearos-contacts"
+    "pearos-notch"
+    "pearos-todo"
+    "pearos-calculator"
+    "pearos-liquidgel"
+    "pearos-window-borders"
+    "pearos-livecd-desktop"
+    "pearos-settings"
+    "pearos-icons"
+    "pearos-keyring"
+    "pearos-zshconfig"
+    "pearos-appmenu"
+    "pearos-dock"
+    "pearos-bootsound"
+    "pearos-muternvf"
+    "pear-calamares-config"
+    "pafari"
+)
+
+echo "Paquets retirés de la liste : ${#REMOVE_PACKAGES[@]}"
+for pkg in "${REMOVE_PACKAGES[@]}"; do
+    echo "  - $pkg"
+done
+
+echo ""
+echo "=== Nettoyage terminé ==="

@@ -1,0 +1,113 @@
+# ============================================================================
+# Thème GRUB pour nemOS
+# Inspiré du style sombre macOS / Catppuccin Mocha
+# Couleurs : Fond bleu nuit profond, accent bleu électrique
+# ============================================================================
+
+# --- Polices ---
+# Utiliser les polices Noto Sans (incluses dans les paquets de base)
+title-font: "Noto Sans Regular 16"
+message-font: "Noto Sans Regular 14"
+terminal-font: "Noto Sans Regular 14"
+
+# --- Couleurs globales ---
+title-color: "#CDD6F4"
+message-color: "#A6ADC8"
+message-bg-color: "#11111B"
+
+# --- Arrière-plan du bureau GRUB ---
+desktop-color: "#0A1628"
+desktop-image: "background.png"
+
+# --- Terminal intégré ---
+terminal-color: "white/#11111B"
+terminal-border: "0"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+
+# ============================================================================
+# Menu de démarrage
+# ============================================================================
++ boot_menu {
+    # Positionnement centré
+    left = 25%
+    top = 30%
+    width = 50%
+    height = 40%
+
+    # Apparence des éléments
+    item_font = "Noto Sans Regular 14"
+    item_color = "#CDD6F4"
+    item_height = 32
+    item_padding = 4
+    item_spacing = 4
+    item_align = "left"
+
+    # Apparence de l'élément sélectionné
+    selected_item_font = "Noto Sans Bold 14"
+    selected_item_color = "#FFFFFF"
+    selected_item_pixmap_style = "select_*.png"
+
+    # Pixmap pour les éléments non sélectionnés
+    item_pixmap_style = "item_*.png"
+
+    # Icônes des entrées de menu
+    icon_width = 32
+    icon_height = 32
+
+    # Scrolling
+    scrollbar = "true"
+    scrollbar_width = 8
+    scrollbar_thumb = "progress_bar_thumb_*.png"
+}
+
+# ============================================================================
+# Barre de progression (timeout)
+# ============================================================================
++ progress_bar {
+    # Identifiant du timer GRUB
+    id = "__timeout__"
+
+    # Positionnement en bas, aligné avec le menu
+    left = 25%
+    top = 75%
+    width = 50%
+    height = 4
+
+    # Couleurs
+    bg_color = "#313244"
+    fg_color = "#1A73E8"
+    border_color = "#1A73E8"
+
+    # Texte
+    text = ""
+    text_color = "#CDD6F4"
+    show_text = true
+    font = "Noto Sans Regular 11"
+
+    # Style pixmap (si des images sont disponibles)
+    bar_style = "progress_bar_*.png"
+}
+
+# ============================================================================
+# Panneau d'information système (optionnel)
+# ============================================================================
++ vbox {
+    left = 0
+    top = 95%
+    width = 100%
+    height = 5%
+}
+
++ label {
+    left = 2%
+    top = 95%+8
+    width = 96%
+    height = 20
+    color = "#6C7086"
+    font = "Noto Sans Regular 11"
+    text = "nemOS — Distribution Linux légère | Echap pour éditer | F1 pour l'aide"
+    align = "center"
+}

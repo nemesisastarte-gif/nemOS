@@ -1,0 +1,173 @@
+# ---------------------------------------------------------------
+# nemOS - Tint2 Panel Configuration
+# macOS-like top bar: logo | global menu | clock | tray | buttons
+# ---------------------------------------------------------------
+
+# ---- Panel ----
+panel_items = L T C S P
+# L = launcher, T = taskbar, C = clock, S = systray, P = separator/button
+# Layout: [Logo/launcher] [taskbar/global menu] ... [clock] [systray] [power]
+
+panel_position = top center horizontal
+panel_size = 100% 28
+panel_margin = 0 0 0 0
+panel_padding = 0 4 0 4
+panel_dock = 0
+panel_layer = top
+panel_monitor = all
+panel_shrink = 0
+autohide = 0
+autohide_show_timeout = 0.3
+autohide_hide_timeout = 1.5
+autohide_height = 2
+strut_policy = follow_size
+panel_background_id = 0
+
+# ---- Backgrounds ----
+# Background 0: Main panel background - #11111B with 95% opacity
+# 95% = 242/255
+bg0 = #11111B, 242, 0, 0
+
+# Background 1: Launcher button hover
+bg1 = #313244, 200, 0, 0
+
+# Background 2: Active taskbar item
+bg2 = #1A73E8, 200, 0, 0
+
+# Background 3: Hovered taskbar item
+bg3 = #45475A, 180, 0, 0
+
+# Background 4: Clock hover
+bg4 = #313244, 200, 0, 0
+
+# Background 5: Systray background
+bg5 = #11111B, 0, 0, 0
+
+# Background 6: Button (power) hover
+bg6 = #F38BA8, 200, 0, 0
+
+# Background 7: Urgent/active indicator
+bg7 = #1A73E8, 255, 0, 0
+
+# ---- Separator/Borders ----
+# Separator 0: Invisible
+sep0 =
+
+# Separator 1: Subtle vertical line
+sep1 = #45475A, 80, 0, 0
+
+# Separator 2: Left padding separator
+sep2 = #11111B, 0, 6, 6
+
+# ---- Font ----
+font_main = Noto Sans 10
+font_task = Noto Sans 10
+font_clock = Noto Sans Bold 10
+font_systray = Noto Sans 10
+
+# ---- Colors ----
+text_color1 = #CDD6F4   # main text
+text_color2 = #6C7086   # dim text
+text_color3 = #FFFFFF   # active text
+text_color4 = #89B4FA   # accent text
+tint2_font_color = #CDD6F4
+
+# ---- Launcher (left side - nemOS logo + global menu) ----
+launcher_icon_theme = Adwaita
+launcher_padding = 0 4 0 4
+launcher_background_id = 0
+launcher_icon_size = 20
+launcher_item_app = /usr/share/applications/nemos-appmenu.desktop
+launcher_icon_asb = 100 0 0
+launcher_startup_tooltip = 0
+
+# ---- Taskbar (center area for global menu / vala-panel-appmenu) ----
+taskbar_mode = single_desktop
+taskbar_padding = 2 4 2 4
+taskbar_background_id = 0
+taskbar_active_background_id = 0
+taskbar_name = 0
+taskbar_name_active = 0
+taskbar_name_background_id = 0
+taskbar_distribute_size = 1
+taskbar_sort = none
+
+# ---- Task buttons ----
+task_icon = 1
+task_text = 1
+task_centered = 1
+task_maximum_size = 200 28
+task_padding = 4 8 4 8
+task_font = Noto Sans 10
+task_font_color = #CDD6F4
+task_active_font_color = #FFFFFF
+task_background_id = 0
+task_active_background_id = 2
+task_urgent_background_id = 7
+task_iconified_font_color = #6C7086
+task_iconified_background_id = 0
+task_tooltip = 1
+
+# ---- Clock (center-right) ----
+clock_tooltip = Heure et date
+clock_padding = 8 12 8 12
+clock_background_id = 0
+clock_font_color = #CDD6F4
+clock_font = Noto Sans Bold 10
+clock_lclick_command = gsimplecal
+clock_rclick_command = xfce4-calendar --chooser
+time1_format = %H:%M
+time2_format = %a %d %b
+time1_timezone =
+time2_timezone =
+clock_tooltip_timezone =
+time1_font_color = #CDD6F4
+time2_font_color = #89B4FA
+
+# ---- Systray (right side - network, volume, etc.) ----
+systray_padding = 6 6 6 6
+systray_background_id = 0
+systray_sort = ascending
+systray_icon_size = 16
+systray_icon_asb = 100 0 0
+systray_monitor = primary
+systray_name_filter =
+
+# ---- Button (right side - power button) ----
+button = new
+button_icon = system-shutdown
+button_text =
+button_tooltip = Alimentation
+button_clicked_command = rofi -show p -modi p:rofi-power-menu -theme ~/.config/rofi/config.rasi || zenity --question --text "Voulez-vous vous déconnecter ?" --ok-label="Déconnexion" --cancel-label="Annuler" && openbox --exit
+button_font = Noto Sans 10
+button_font_color = #CDD6F4
+button_padding = 4 10 4 10
+button_background_id = 0
+button_hover_background_id = 6
+button_pressed_background_id = 6
+button_centered = 0
+button_max_icon_size = 16
+
+# ---- Tooltip ----
+tooltip_padding = 6 10 6 10
+tooltip_background_id = 1
+tooltip_font_color = #CDD6F4
+tooltip_font = Noto Sans 10
+
+# ---- Mouse actions ----
+mouse_middle = none
+mouse_right = toggle
+mouse_scroll_up = toggle
+mouse_scroll_down = iconify
+
+# ---- Battery (optional, shown if battery present) ----
+battery_hide = 98
+battery_low_status = 20
+battery_low_cmd = notify-send -u critical "Batterie faible" "Niveau de batterie inférieur à 20%%"
+bat1_font = Noto Sans 10
+bat2_font = Noto Sans 10
+battery_font_color = #CDD6F4
+bat1_format = %status %percentage
+bat2_format = %time %percentage
+battery_padding = 2 6 2 6
+battery_background_id = 0

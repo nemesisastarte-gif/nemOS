@@ -1,0 +1,464 @@
+# ══════════════════════════════════════════════════════════════
+# nemOS-Dark — GTK 2.0 Theme (macOS Mojave-inspired dark)
+# Designed for nemOS lightweight Linux distribution
+# License: MIT
+# ══════════════════════════════════════════════════════════════
+
+gtk-color-scheme = "\
+bg_color:#1E1E2E\n\
+fg_color:#CDD6F4\n\
+base_color:#11111B\n\
+text_color:#CDD6F4\n\
+selected_bg_color:#1A73E8\n\
+selected_fg_color:#FFFFFF\n\
+tooltip_bg_color:#242436\n\
+tooltip_fg_color:#CDD6F4\n\
+border_color:#313244\n\
+link_color:#1A73E8"
+
+# ── Global ──────────────────────────────────────────────────
+gtk-icon-sizes = "gtk-menu=16,16:gtk-button=16,16:gtk-small-toolbar=16,16:gtk-large-toolbar=24,24:gtk-dialog=24,24"
+gtk-menu-bar-popup-delay = 0
+
+style "default" {
+  font_name = "Noto Sans 10"
+  xthickness = 1
+  ythickness = 1
+
+  # Colors
+  bg[NORMAL]      = "#1E1E2E"
+  bg[PRELIGHT]    = "#313244"
+  bg[ACTIVE]      = "#181825"
+  bg[SELECTED]    = "#1A73E8"
+  bg[INSENSITIVE] = "#181825"
+
+  fg[NORMAL]      = "#CDD6F4"
+  fg[PRELIGHT]    = "#FFFFFF"
+  fg[ACTIVE]      = "#CDD6F4"
+  fg[SELECTED]    = "#FFFFFF"
+  fg[INSENSITIVE] = "#585B70"
+
+  text[NORMAL]      = "#CDD6F4"
+  text[PRELIGHT]    = "#CDD6F4"
+  text[ACTIVE]      = "#CDD6F4"
+  text[SELECTED]    = "#FFFFFF"
+  text[INSENSITIVE] = "#585B70"
+
+  base[NORMAL]      = "#11111B"
+  base[PRELIGHT]    = "#1E1E2E"
+  base[ACTIVE]      = "#181825"
+  base[SELECTED]    = "#1A73E8"
+  base[INSENSITIVE] = "#181825"
+
+  # Spacing / Focus
+  GtkWidget::focus-padding   = 0
+  GtkWidget::focus-line-width = 1
+  GtkWidget::interior-focus  = 1
+
+  # Scrollbars
+  GtkScrollbar::trough-border   = 0
+  GtkScrollbar::slider-width    = 8
+  GtkScrollbar::min-slider-length = 30
+  GtkScrollbar::stepper-size    = 0
+  GtkScrollbar::has-backward-stepper  = 0
+  GtkScrollbar::has-forward-stepper   = 0
+  GtkRange::trough-border = 0
+  GtkRange::slider-width  = 8
+
+  # Toolbar / Menubar shadows
+  GtkToolbar::shadow-type   = GTK_SHADOW_NONE
+  GtkMenuBar::shadow-type   = GTK_SHADOW_NONE
+  GtkMenu::shadow-type      = GTK_SHADOW_NONE
+  GtkHandleBox::shadow-type = GTK_SHADOW_NONE
+
+  # Buttons
+  GtkButton::inner-border          = {8, 8, 4, 4}
+  GtkButton::default-border        = {0, 0, 0, 0}
+  GtkButton::default-outside-border = {0, 0, 0, 0}
+  GtkButton::child-displacement-x  = 0
+  GtkButton::child-displacement-y  = 0
+  GtkButton::default-spacing       = 0
+
+  # Tree / List
+  GtkTreeView::odd-row-color  = "#222236"
+  GtkTreeView::even-row-color = "#11111B"
+  GtkTreeView::expander-size  = 12
+  GtkTreeView::vertical-separator = 0
+  GtkTreeView::horizontal-separator = 0
+
+  # Entry / Spin
+  GtkEntry::inner-border = {6, 6, 3, 3}
+
+  # Notebook
+  GtkNotebook::tab-overlap  = 0
+  GtkNotebook::tab-curvature = 0
+
+  # Progress
+  GtkProgressBar::min-horizontal-bar-height = 6
+  GtkProgressBar::min-vertical-bar-width   = 6
+
+  # Others
+  GtkPaned::handle-size = 4
+  GtkExpander::expander-size = 14
+}
+
+# ── Buttons ─────────────────────────────────────────────────
+style "button" = "default" {
+  bg[NORMAL]      = "#313244"
+  bg[PRELIGHT]    = "#45475A"
+  bg[ACTIVE]      = "#1A73E8"
+  bg[SELECTED]    = "#1A73E8"
+  bg[INSENSITIVE] = "#242436"
+
+  fg[NORMAL]      = "#CDD6F4"
+  fg[PRELIGHT]    = "#FFFFFF"
+  fg[ACTIVE]      = "#FFFFFF"
+  fg[INSENSITIVE] = "#585B70"
+
+  text[NORMAL]      = "#CDD6F4"
+  text[PRELIGHT]    = "#FFFFFF"
+  text[ACTIVE]      = "#FFFFFF"
+  text[INSENSITIVE] = "#585B70"
+
+  engine "pixmap" {
+    image {
+      function = BOX
+      state    = NORMAL
+      file     = "button-normal.png"
+      border   = {12, 12, 6, 6}
+      stretch  = TRUE
+    }
+    image {
+      function = BOX
+      state    = PRELIGHT
+      file     = "button-prelight.png"
+      border   = {12, 12, 6, 6}
+      stretch  = TRUE
+    }
+    image {
+      function = BOX
+      state    = ACTIVE
+      file     = "button-active.png"
+      border   = {12, 12, 6, 6}
+      stretch  = TRUE
+    }
+    image {
+      function = BOX
+      state    = INSENSITIVE
+      file     = "button-insensitive.png"
+      border   = {12, 12, 6, 6}
+      stretch  = TRUE
+    }
+  }
+}
+
+# ── Entry ───────────────────────────────────────────────────
+style "entry" = "default" {
+  bg[NORMAL]   = "#11111B"
+  bg[PRELIGHT] = "#11111B"
+  bg[ACTIVE]   = "#11111B"
+
+  fg[NORMAL]   = "#CDD6F4"
+  fg[PRELIGHT] = "#CDD6F4"
+  fg[ACTIVE]   = "#CDD6F4"
+
+  base[NORMAL] = "#11111B"
+  text[NORMAL] = "#CDD6F4"
+  text[SELECTED] = "#FFFFFF"
+  base[SELECTED] = "#1A73E8"
+}
+
+# ── Scrollbar ───────────────────────────────────────────────
+style "scrollbar" = "default" {
+  bg[NORMAL]   = "#181825"
+  trough-color = "#181825"
+
+  engine "pixmap" {
+    image {
+      function = SLIDER
+      state    = NORMAL
+      file     = "scrollbar-slider.png"
+      border   = {3, 3, 3, 3}
+      stretch  = TRUE
+      orientation = VERTICAL
+    }
+    image {
+      function = SLIDER
+      state    = PRELIGHT
+      file     = "scrollbar-slider-prelight.png"
+      border   = {3, 3, 3, 3}
+      stretch  = TRUE
+      orientation = VERTICAL
+    }
+    image {
+      function = SLIDER
+      state    = NORMAL
+      file     = "scrollbar-slider-h.png"
+      border   = {3, 3, 3, 3}
+      stretch  = TRUE
+      orientation = HORIZONTAL
+    }
+    image {
+      function = SLIDER
+      state    = PRELIGHT
+      file     = "scrollbar-slider-h-prelight.png"
+      border   = {3, 3, 3, 3}
+      stretch  = TRUE
+      orientation = HORIZONTAL
+    }
+  }
+}
+
+# ── Menubar ─────────────────────────────────────────────────
+style "menubar" = "default" {
+  bg[NORMAL]   = "#11111B"
+  bg[PRELIGHT] = "#1A73E8"
+  fg[NORMAL]   = "#CDD6F4"
+  fg[PRELIGHT] = "#FFFFFF"
+}
+
+# ── Menu ────────────────────────────────────────────────────
+style "menu" = "default" {
+  bg[NORMAL]     = "#242436"
+  bg[PRELIGHT]   = "#1A73E8"
+  bg[ACTIVE]     = "#1A73E8"
+  fg[NORMAL]     = "#CDD6F4"
+  fg[PRELIGHT]   = "#FFFFFF"
+  fg[ACTIVE]     = "#FFFFFF"
+  fg[INSENSITIVE] = "#585B70"
+
+  xthickness = 2
+  ythickness = 2
+
+  GtkMenuItem::arrow-spacing    = 8
+  GtkMenuItem::horizontal-padding = 8
+  GtkMenuItem::toggle-spacing   = 8
+}
+
+# ── Menu Item ───────────────────────────────────────────────
+style "menuitem" = "default" {
+  bg[PRELIGHT]  = "#1A73E8"
+  bg[SELECTED]  = "#1A73E8"
+  fg[PRELIGHT]  = "#FFFFFF"
+  fg[SELECTED]  = "#FFFFFF"
+  fg[INSENSITIVE] = "#585B70"
+
+  xthickness = 8
+  ythickness = 3
+}
+
+# ── Tooltip ─────────────────────────────────────────────────
+style "tooltip" = "default" {
+  bg[NORMAL] = "#242436"
+  fg[NORMAL] = "#CDD6F4"
+
+  xthickness = 8
+  ythickness = 4
+}
+
+# ── Notebook ────────────────────────────────────────────────
+style "notebook" = "default" {
+  bg[NORMAL]   = "#181825"
+  bg[ACTIVE]   = "#1E1E2E"
+  fg[NORMAL]   = "#A6ADC8"
+  fg[ACTIVE]   = "#CDD6F4"
+
+  engine "pixmap" {
+    image {
+      function = TAB
+      state    = NORMAL
+      file     = "notebook-tab.png"
+      border   = {4, 4, 0, 2}
+      stretch  = TRUE
+    }
+    image {
+      function = TAB
+      state    = ACTIVE
+      file     = "notebook-tab-active.png"
+      border   = {4, 4, 0, 2}
+      stretch  = TRUE
+    }
+  }
+}
+
+# ── Progress Bar ────────────────────────────────────────────
+style "progressbar" = "default" {
+  bg[NORMAL]   = "#181825"
+  bg[PRELIGHT] = "#181825"
+  fg[NORMAL]   = "#1A73E8"
+
+  engine "pixmap" {
+    image {
+      function = BOX
+      state    = NORMAL
+      file     = "progressbar-trough.png"
+      border   = {3, 3, 3, 3}
+      stretch  = TRUE
+    }
+    image {
+      function = BOX
+      state    = PRELIGHT
+      file     = "progressbar-fill.png"
+      border   = {3, 3, 3, 3}
+      stretch  = TRUE
+    }
+  }
+}
+
+# ── Scale ───────────────────────────────────────────────────
+style "scale" = "default" {
+  bg[NORMAL]     = "#181825"
+  fg[NORMAL]     = "#1A73E8"
+  trough-color   = "#181825"
+}
+
+# ── Range ───────────────────────────────────────────────────
+style "range" = "default" {
+  trough-color = "#181825"
+  slider-color = "#FFFFFF"
+}
+
+# ── Check / Radio ───────────────────────────────────────────
+style "check" = "default" {
+  bg[NORMAL]      = "#11111B"
+  bg[PRELIGHT]    = "#11111B"
+  bg[ACTIVE]      = "#11111B"
+  bg[SELECTED]    = "#1A73E8"
+  fg[NORMAL]      = "#585B70"
+  fg[PRELIGHT]    = "#CDD6F4"
+  fg[ACTIVE]      = "#FFFFFF"
+  fg[SELECTED]    = "#FFFFFF"
+  text[SELECTED]  = "#FFFFFF"
+  base[SELECTED]  = "#1A73E8"
+
+  GtkCheckButton::indicator-size = 16
+  GtkCheckButton::indicator-spacing = 4
+}
+
+style "radio" = "check" {
+  GtkRadioButton::indicator-size = 16
+}
+
+# ── Sidebar ─────────────────────────────────────────────────
+style "sidebar" = "default" {
+  bg[NORMAL]     = "#181825"
+  bg[PRELIGHT]   = "rgba(205,214,244,0.06)"
+  bg[SELECTED]   = "#1A73E8"
+  fg[NORMAL]     = "#CDD6F4"
+  fg[PRELIGHT]   = "#CDD6F4"
+  fg[SELECTED]   = "#FFFFFF"
+  fg[INSENSITIVE] = "#585B70"
+}
+
+# ── Tree View ───────────────────────────────────────────────
+style "treeview" = "default" {
+  bg[NORMAL]   = "#11111B"
+  bg[SELECTED] = "#1A73E8"
+  fg[NORMAL]   = "#CDD6F4"
+  fg[SELECTED] = "#FFFFFF"
+  text[NORMAL]   = "#CDD6F4"
+  text[SELECTED] = "#FFFFFF"
+  base[NORMAL]   = "#11111B"
+  base[SELECTED] = "#1A73E8"
+}
+
+# ── Frame ───────────────────────────────────────────────────
+style "frame" = "default" {
+  bg[NORMAL] = "#1E1E2E"
+  fg[NORMAL] = "#A6ADC8"
+}
+
+# ── Dialog ──────────────────────────────────────────────────
+style "dialog" = "default" {
+  bg[NORMAL] = "#1E1E2E"
+}
+
+# ── Status Bar ──────────────────────────────────────────────
+style "statusbar" = "default" {
+  bg[NORMAL] = "#11111B"
+  fg[NORMAL] = "#A6ADC8"
+}
+
+# ── Info Bar ────────────────────────────────────────────────
+style "infobar" = "default" {
+  bg[NORMAL] = "#1A73E8"
+  fg[NORMAL] = "#FFFFFF"
+}
+
+# ── Clamp ───────────────────────────────────────────────────
+style "clamp" = "default" {
+  bg[NORMAL] = "#1E1E2E"
+}
+
+# ══════════════════════════════════════════════════════════════
+# Widget class assignments
+# ══════════════════════════════════════════════════════════════
+class "GtkWidget"            style "default"
+class "GtkButton"            style "button"
+class "GtkEntry"             style "entry"
+class "GtkSpinButton"        style "entry"
+class "GtkScrollbar"         style "scrollbar"
+class "GtkMenuBar"           style "menubar"
+class "GtkMenu"              style "menu"
+widget_class "*<GtkMenuItem>*"  style "menuitem"
+widget_class "*<GtkNotebook>"   style "notebook"
+widget_class "*<GtkCheckButton>*" style "check"
+widget_class "*<GtkCheckMenuItem>*" style "check"
+widget_class "*<GtkRadioButton>*" style "radio"
+widget_class "*<GtkRadioMenuItem>*" style "radio"
+widget_class "*<GtkTreeView>*"  style "treeview"
+widget_class "*<GtkFrame>"      style "frame"
+widget_class "*<GtkDialog>*"    style "dialog"
+widget_class "*<GtkStatusbar>*" style "statusbar"
+widget_class "*<GtkInfoBar>*"   style "infobar"
+widget_class "*<GtkProgressBar>*" style "progressbar"
+widget_class "*<GtkScale>*"     style "scale"
+widget_class "*<GtkRange>*"     style "range"
+widget_class "*Sidebar*"        style "sidebar"
+widget_class "*.tooltip*"       style "tooltip"
+widget_class "*Clamp*"          style "clamp"
+
+# ── Window decorations ──────────────────────────────────────
+style "window" = "default" {
+  bg[NORMAL] = "#1E1E2E"
+  GtkWindow::resize-grip-width = 0
+  GtkWindow::resize-grip-height = 0
+}
+class "GtkWindow" style "window"
+
+# ── Toolbar ─────────────────────────────────────────────────
+style "toolbar" = "default" {
+  bg[NORMAL]   = "#11111B"
+  bg[PRELIGHT] = "rgba(205,214,244,0.06)"
+  fg[NORMAL]   = "#CDD6F4"
+  fg[PRELIGHT] = "#CDD6F4"
+}
+widget_class "*<GtkToolbar>*" style "toolbar"
+
+# ── Handle Box ──────────────────────────────────────────────
+style "handlebox" = "default" {
+  bg[NORMAL] = "#11111B"
+}
+class "GtkHandleBox" style "handlebox"
+
+# ── Calendar ────────────────────────────────────────────────
+style "calendar" = "default" {
+  bg[NORMAL]   = "#1E1E2E"
+  bg[PRELIGHT] = "#1A73E8"
+  bg[SELECTED] = "#1A73E8"
+  fg[NORMAL]   = "#CDD6F4"
+  fg[PRELIGHT] = "#CDD6F4"
+  fg[SELECTED] = "#FFFFFF"
+  text[NORMAL]   = "#CDD6F4"
+  text[SELECTED] = "#FFFFFF"
+  base[NORMAL]   = "#11111B"
+  base[SELECTED] = "#1A73E8"
+}
+widget_class "*<GtkCalendar>*" style "calendar"
+
+# ── File Chooser ────────────────────────────────────────────
+style "filechooser" = "default" {
+  bg[NORMAL] = "#1E1E2E"
+}
+widget_class "*<GtkFileChooser>*" style "filechooser"
+widget_class "*<GtkFileChooserWidget>*" style "filechooser"

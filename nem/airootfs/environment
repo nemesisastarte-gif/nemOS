@@ -1,0 +1,29 @@
+# Configuration de l'environnement live pour nemOS
+
+# Locale par défaut (français)
+LANG=fr_FR.UTF-8
+LC_ALL=fr_FR.UTF-8
+LANGUAGE=fr_FR
+
+# Variables spécifiques à nemOS
+export NEMOS_VERSION="1.0.0"
+export NEMOS_CODENAME="Aube"
+
+# Chemins personnalisés
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin"
+export XDG_DATA_DIRS="/usr/share:/usr/local/share"
+
+# Thème GTK par défaut
+export GTK_THEME=nemOS-Dark
+export GTK2_RC_FILES="/usr/share/themes/nemOS-Dark/gtk-2.0/gtkrc"
+
+# Thème des icônes
+export ICON_THEME=nemOS-Icons
+
+# Thème du curseur
+export XCURSOR_THEME=Adwaita
+export XCURSOR_SIZE=24
+
+# Terminal par défaut
+export TERM=xterm-256color
+export EDITOR=nano
