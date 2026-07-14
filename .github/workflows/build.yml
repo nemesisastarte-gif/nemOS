@@ -229,7 +229,7 @@ jobs:
           # Locale
           sudo sed -i 's/#fr_FR.UTF-8/fr_FR.UTF-8/' /opt/nemos-chroot/etc/locale.gen
           sudo chroot /opt/nemos-chroot locale-gen fr_FR.UTF-8
-          sudo chroot /opt/nemos-chroot update-locale LANG=fr_FR.UTF-8
+          printf 'LANG=fr_FR.UTF-8\n' | sudo tee /opt/nemos-chroot/etc/default/locale > /dev/null
 
           # Hostname
           printf 'nemOS\n' | sudo tee /opt/nemos-chroot/etc/hostname > /dev/null
