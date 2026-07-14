@@ -55,7 +55,6 @@ jobs:
             zstd \
             qemu-system-x86 \
             expect \
-            fc-match \
             librsvg2-bin \
             imagemagick \
             pv
