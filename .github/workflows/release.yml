@@ -1,0 +1,99 @@
+name: Publication ISO sur Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag de la release (ex: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      run_id:
+        description: 'ID du build run contenant l ISO (laisser vide pour le dernier run réussi)'
+        required: false
+        default: ''
+
+jobs:
+  publish:
+    name: "Publication ISO"
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Déterminer le run ID
+        id: runid
+        run: |
+          if [ -n "${{ github.event.inputs.run_id }}" ]; then
+            RUN_ID="${{ github.event.inputs.run_id }}"
+          else
+            # Trouver le dernier run réussi du workflow "Construction nemOS ISO"
+            RUN_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build.yml/runs?status=success&per_page=1" \
+              | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['workflow_runs'][0]['id'])")
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "Utilisant le run ID: $RUN_ID"
+
+      - name: Télécharger l'ISO
+        uses: actions/download-artifact@v4
+        with:
+          name: nemOS-ISO
+          run-id: ${{ steps.runid.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Télécharger les checksums
+        uses: actions/download-artifact@v4
+        with:
+          name: nemOS-checksums
+          run-id: ${{ steps.runid.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Vérifier les fichiers
+        run: |
+          echo "=== Fichiers téléchargés ==="
+          ls -lh
+          ISO_FILE=$(ls *.iso 2>/dev/null | head -1)
+          if [ -z "$ISO_FILE" ]; then
+            echo "ERREUR: Aucun fichier ISO trouvé"
+            exit 1
+          fi
+          echo "ISO: $ISO_FILE ($(du -sh "$ISO_FILE" | cut -f1))"
+
+      - name: Upload sur la release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.event.inputs.release_tag }}"
+          echo "Publication sur la release $TAG..."
+
+          ISO_FILE=$(ls *.iso 2>/dev/null | head -1)
+          SHA_FILE=$(ls *.sha256 2>/dev/null | head -1)
+
+          # Vérifier si la release existe
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG existe, upload des assets..."
+            gh release upload "$TAG" "$ISO_FILE" "$SHA_FILE" --clobber
+          else
+            echo "Création de la release $TAG..."
+            gh release create "$TAG" \
+              --title "nemOS $TAG" \
+              --notes "nemOS $TAG - Distribution Linux 32-bit avec interface macOS-like
+
+              ## Téléchargement
+              - \`$(basename $ISO_FILE)\` - Image ISO bootable (Live USB)
+              - \`$(basename $SHA_FILE)\` - Somme de contrôle SHA256
+
+              ## Utilisation
+              1. Flasher l'ISO sur une clé USB avec Rufus ou BalenaEtcher
+              2. Démarrer l'ordinateur depuis la clé USB
+              3. Profiter de nemOS !
+
+              ## Système requis
+              - Processeur 32-bit (i686) ou 64-bit compatible
+              - 512 Mo RAM minimum
+              - 4 Go d'espace disque" \
+              "$ISO_FILE" "$SHA_FILE"
+          fi
+
+          echo "✅ Publication terminée !"
