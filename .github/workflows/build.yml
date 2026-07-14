@@ -427,143 +427,93 @@ jobs:
       # =====================================================================
       - name: Nettoyage et optimisation
         run: |
-          set -e
-          echo "=== Étape 5 : Nettoyage ==="
+          echo "=== Etape 5 : Nettoyage ==="
+          CHROOT=/opt/nemos-chroot
 
-          sudo chroot /opt/nemos-chroot /bin/bash -c '
-            # Nettoyer le cache apt
-            apt-get clean
-            apt-get autoremove -y --purge
+          # Nettoyer le cache apt
+          sudo chroot "$CHROOT" apt-get clean 2>/dev/null || true
+          sudo chroot "$CHROOT" apt-get autoremove -y --purge 2>/dev/null || true
 
-            # Supprimer les locales inutiles (garder fr et en)
-            find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name "fr*" ! -name "en*" ! -name "locale.alias" -exec rm -rf {} +
+          # Supprimer les locales inutiles
+          sudo find "$CHROOT/usr/share/locale" -mindepth 1 -maxdepth 1 \
+            ! -name "fr*" ! -name "en*" ! -name "locale.alias" \
+            -exec rm -rf {} + 2>/dev/null || true
 
-            # Supprimer la documentation inutile
-            rm -rf /usr/share/doc/*
-            rm -rf /usr/share/man/?? \
-                    /usr/share/man/??_*
+          # Supprimer la documentation
+          sudo rm -rf "$CHROOT/usr/share/doc"/* 2>/dev/null || true
+          sudo rm -rf "$CHROOT/usr/share/man"/* 2>/dev/null || true
 
-            # Garder les manuels français et anglais
-            mkdir -p /usr/share/man/fr /usr/share/man/fr.UTF-8 /usr/share/man/en /usr/share/man/man1 /usr/share/man/man5 /usr/share/man/man8
+          # Supprimer les logs et caches
+          sudo rm -rf "$CHROOT/var/log"/*.log "$CHROOT/var/log/journal"/* 2>/dev/null || true
+          sudo rm -rf "$CHROOT/tmp"/* "$CHROOT/var/tmp"/* 2>/dev/null || true
+          sudo rm -rf "$CHROOT/var/cache/apt/archives"/* 2>/dev/null || true
+          sudo rm -rf "$CHROOT/root/.cache"/* "$CHROOT/home/nem/.cache"/* 2>/dev/null || true
 
-            # Supprimer les logs
-            rm -rf /var/log/*.log /var/log/journal/*
-            rm -rf /tmp/* /var/tmp/*
+          # Zero les blocks libres
+          sudo dd if=/dev/zero of="$CHROOT/zero" bs=1M 2>/dev/null || true
+          sudo rm -f "$CHROOT/zero"
 
-            # Supprimer les caches
-            rm -rf /root/.cache/*
-            rm -rf /home/nem/.cache/*
-            rm -rf /var/cache/apt/archives/*
-
-            # Zero les blocks libres pour meilleure compression
-            dd if=/dev/zero of=/zero bs=1M 2>/dev/null || true
-            rm -f /zero
-          '
-
-          echo "✅ Nettoyage terminé"
-          sudo du -sh /opt/nemos-chroot
+          echo "Nettoyage termine : $(sudo du -sh $CHROOT | cut -f1)"
 
       # =====================================================================
       # ÉTAPE 6 : Création de l'ISO bootable
       # =====================================================================
-      - name: Création de l'ISO bootable
+      - name: Creation de l'ISO bootable
         id: info
         run: |
-          set -e
-          echo "=== Étape 6 : Création de l'ISO ==="
-
+          echo "=== Etape 6 : Creation de l'ISO ==="
           WORKDIR=/opt/nemos-iso-work
           ISO_OUT=/opt/nemos-out
-          sudo mkdir -p "$WORKDIR" "$ISO_OUT"
+          ISO_NAME="nemOS-1.0.0-$(date +%Y%m%d)-i386"
 
-          DATE=$(date +%Y%m%d)
-          ISO_NAME="nemOS-1.0.0-${DATE}-i386"
+          sudo mkdir -p "$WORKDIR/iso" "$ISO_OUT" "$WORKDIR/iso/isolinux" "$WORKDIR/iso/boot"
 
-          # Créer la structure ISO
-          sudo mkdir -p "$WORKDIR/iso/nemOS"
-          sudo cp -a /opt/nemos-chroot/* "$WORKDIR/iso/nemOS/"
+          # Copier le noyau et l'initrd
+          sudo cp /opt/nemos-chroot/boot/vmlinuz-* "$WORKDIR/iso/boot/vmlinuz" 2>/dev/null || true
+          sudo cp /opt/nemos-chroot/boot/initrd.img-* "$WORKDIR/iso/boot/initrd" 2>/dev/null || true
 
-          # Créer le système de fichiers compressé avec squashfs
-          echo "📦 Compression squashfs avec zstd..."
-          sudo mksquashfs "$WORKDIR/iso/nemOS" "$WORKDIR/iso/live/filesystem.squashfs" \
-            -comp zstd -Xcompression-level 19 -b 1M \
-            -noappend -e "var/cache/*" "var/tmp/*" "tmp/*"
+          # Verifier que le noyau existe
+          if [ ! -f "$WORKDIR/iso/boot/vmlinuz" ]; then
+            echo "ERREUR: Noyau non trouve dans le chroot"
+            ls -la /opt/nemos-chroot/boot/
+            exit 1
+          fi
 
-          echo "✅ SquashFS créé : $(du -sh $WORKDIR/iso/live/filesystem.squashfs | cut -f1)"
+          echo "Noyau: $(du -sh $WORKDIR/iso/boot/vmlinuz | cut -f1)"
+          echo "Initrd: $(du -sh $WORKDIR/iso/boot/initrd | cut -f1)"
 
-          # Créer l'ISO bootable avec GRUB et xorriso
-          echo "💿 Création de l'ISO bootable avec xorriso..."
+          # Copier le filesystem complet dans l'ISO (pour un systeme live simple)
+          # Pas de squashfs - le systeme est installe directement dans l'ISO
+          echo "Copie du filesystem (cela peut prendre du temps)..."
+          sudo cp -a /opt/nemos-chroot/* "$WORKDIR/iso/" 2>/dev/null &
+          CP_PID=$!
+          # Afficher la progression
+          while kill -0 $CP_PID 2>/dev/null; do sleep 10; echo "  copie en cours..."; done
+          wait $CP_PID
 
-          # Copier les fichiers de boot
-          sudo mkdir -p "$WORKDIR/iso/boot/grub"
-          sudo cp -r /opt/nemos-chroot/boot/vmlinuz-* "$WORKDIR/iso/boot/vmlinuz" 2>/dev/null || \
-          sudo cp /opt/nemos-chroot/boot/vmlinuz-* "$WORKDIR/iso/boot/" 2>/dev/null || true
+          echo "Taille du filesystem ISO: $(sudo du -sh $WORKDIR/iso | cut -f1)"
 
-          sudo cp -r /opt/nemos-chroot/boot/initrd.img-* "$WORKDIR/iso/boot/initrd" 2>/dev/null || \
-          sudo cp /opt/nemos-chroot/boot/initrd.img-* "$WORKDIR/iso/boot/" 2>/dev/null || true
+          # Configurer le fstab et mounts pour le live
+          sudo mkdir -p "$WORKDIR/iso/etc"
+          printf '/dev/sr0\t/iso\tiso9660\tro,relatime\t0 0\n' | sudo tee -a "$WORKDIR/iso/etc/fstab" > /dev/null
 
-          # Créer un GRUB minimal pour le boot
-          sudo mkdir -p "$WORKDIR/iso/boot/grub"
+          # Isolinux - boot BIOS
+          sudo cp /usr/lib/ISOLINUX/isolinux.bin "$WORKDIR/iso/isolinux/"
+          sudo cp /usr/lib/syslinux/modules/bios/ldlinux.c32 "$WORKDIR/iso/isolinux/"
+          sudo cp /usr/lib/syslinux/modules/bios/libcom32.c32 "$WORKDIR/iso/isolinux/" 2>/dev/null || true
+          sudo cp /usr/lib/syslinux/modules/bios/libutil.c32 "$WORKDIR/iso/isolinux/" 2>/dev/null || true
 
-          # Grub config pour l'ISO
-          sudo tee "$WORKDIR/iso/boot/grub/grub.cfg" > /dev/null << 'GRUBCFG'
-          set timeout=10
-          set default=0
+          # Config isolinux
+          printf 'DEFAULT nemos\nPROMPT 0\nTIMEOUT 50\n\n' | sudo tee "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null
+          printf 'LABEL nemos\n  MENU LABEL nemOS - Mode Live (32-bit)\n  KERNEL /boot/vmlinuz\n  APPEND initrd=/boot/initrd boot=live quiet splash\n  MENU DEFAULT\n' | sudo tee -a "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null
+          printf '\nLABEL nemos-safe\n  MENU LABEL nemOS - Mode sans echec\n  KERNEL /boot/vmlinuz\n  APPEND initrd=/boot/initrd boot=live nomodeset\n' | sudo tee -a "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null
 
-          menuentry "nemOS - Mode Live (32-bit)" {
-            linux /boot/vmlinuz boot=live components quiet splash
-            initrd /boot/initrd
-          }
+          # Splash screen
+          sudo cp nem/syslinux/splash.png "$WORKDIR/iso/isolinux/" 2>/dev/null || true
 
-          menuentry "nemOS - Mode sans echec" {
-            linux /boot/vmlinuz boot=live components nomodeset
-            initrd /boot/initrd
-          }
-          GRUBCFG
-
-          # Créer l'ISO avec xorriso (mode hybrid BIOS+EFI)
+          # Creation ISO avec xorriso (isolinux, BIOS boot)
+          echo "Creation de l'ISO avec xorriso..."
           sudo xorriso -as mkisofs \
-            -r \
-            -V "nemOS" \
-            -o "${ISO_OUT}/${ISO_NAME}.iso" \
-            --grub2-mbr /usr/lib/GRUB/i386-pc/boot_hybrid.img \
-            --partition_layout 1 \
-            -b boot/grub/i386-pc/eltorito.img \
-            --no-emul-boot \
-            -boot-load-size 4 \
-            -boot-info-table \
-            --efi-boot boot/grub/i386-efi/efi.img \
-            -efi-boot-part \
-            --efi-boot-image \
-            --protective-msdos-label \
-            "$WORKDIR/iso" \
-            -volume_date all_file_dates ="$(date -u +%Y%m%d%H%M%S00)" \
-            2>&1 || \
-          # Fallback : ISO simple bootable avec isolinux
-          (echo "⚠️ xorriso grub échoué, utilisation de isolinux..." && \
-           sudo mkdir -p "$WORKDIR/iso/isolinux" && \
-           sudo cp /usr/lib/ISOLINUX/isolinux.bin "$WORKDIR/iso/isolinux/" && \
-           sudo cp /usr/lib/syslinux/modules/bios/ldlinux.c32 "$WORKDIR/iso/isolinux/" && \
-           sudo cp /usr/lib/syslinux/modules/bios/libcom32.c32 "$WORKDIR/iso/isolinux/" && \
-           sudo cp /usr/lib/syslinux/modules/bios/libutil.c32 "$WORKDIR/iso/isolinux/" && \
-           sudo cp nem/syslinux/splash.png "$WORKDIR/iso/isolinux/" && \
-           sudo tee "$WORKDIR/iso/isolinux/isolinux.cfg" > /dev/null << 'ISOLINUX'
-          DEFAULT nemos
-          PROMPT 0
-          TIMEOUT 50
-
-          LABEL nemos
-            MENU LABEL nemOS - Mode Live (32-bit)
-            KERNEL /boot/vmlinuz
-            APPEND initrd=/boot/initrd boot=live quiet splash
-            MENU DEFAULT
-
-          LABEL nemos-safe
-            MENU LABEL nemOS - Mode sans echec
-            KERNEL /boot/vmlinuz
-            APPEND initrd=/boot/initrd boot=live nomodeset
-          ISOLINUX
-           sudo xorriso -as mkisofs \
             -r \
             -V "nemOS" \
             -o "${ISO_OUT}/${ISO_NAME}.iso" \
@@ -573,23 +523,20 @@ jobs:
             -boot-load-size 4 \
             -boot-info-table \
             "$WORKDIR/iso" \
-            2>&1)
+            2>&1
 
-          # Vérifier l'ISO
-          if [[ -f "${ISO_OUT}/${ISO_NAME}.iso" ]]; then
+          # Verifier
+          if [ -f "${ISO_OUT}/${ISO_NAME}.iso" ]; then
             ISO_SIZE=$(du -sh "${ISO_OUT}/${ISO_NAME}.iso" | cut -f1)
-            echo ""
-            echo "✅ ISO créée avec succès : ${ISO_NAME}.iso (${ISO_SIZE})"
+            echo "ISO creee avec succes : ${ISO_NAME}.iso (${ISO_SIZE})"
             ls -lh "${ISO_OUT}/"
           else
-            echo "❌ Échec de la création de l'ISO"
+            echo "ERREUR: ISO non creee"
             exit 1
           fi
 
-          # Créer le checksum
+          # Checksum
           (cd "$ISO_OUT" && sha256sum "${ISO_NAME}.iso" > "${ISO_NAME}.iso.sha256")
-
-          # Sauvegarder le nom pour les jobs suivants
           echo "iso_name=${ISO_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Upload de l'ISO
